@@ -24,6 +24,11 @@ public class Task {
         this.status = Statuses.valueOf(status);
     }
 
+    @Override
+    public String toString() {
+        return title + "( taskId = " + taskId + " )";
+    }
+
 
 }
 

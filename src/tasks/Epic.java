@@ -19,14 +19,7 @@ public class Epic extends Task {
         }
     }
 
-    @Override
-    public void setStatus(String status) {
-        this.status = Statuses.valueOf(status);
 
-        for(SubTask subTask : subTasksList) {
-            subTask.setStatus(status);
-        }
-    }
 
     public boolean areAllSubTasksInStatus(String status) {
         Statuses enumStatus = Statuses.valueOf(status);
