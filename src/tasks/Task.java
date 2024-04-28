@@ -6,8 +6,8 @@ import java.util.Random;
 public class Task {
     private final static int INITIAL_CAPACITY = 20;
     private final static Random RANDOM_GENERATOR = new Random();
-    private final static ArrayList<Short> ID_LIST = new ArrayList<>(INITIAL_CAPACITY);
-    public  short id;
+    public final static ArrayList<Short> ID_LIST = new ArrayList<>(INITIAL_CAPACITY);
+    public short id;
     public String title;
     public String description;
     public Statuses status;
@@ -47,13 +47,14 @@ public class Task {
     public boolean equals(Object o) {
         if (this == o) {
             return true;
-        } else if ( (o == null) || (this.getClass() != o.getClass()) ) {
+        } else if ((o == null) || (this.getClass() != o.getClass())) {
             return false;
         }
         Task task = (Task) o;
 
-        return  (this.id == task.id);
+        return (this.id == task.id);
     }
+
     @Override
     public int hashCode() {
         return id;

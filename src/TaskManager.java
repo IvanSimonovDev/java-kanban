@@ -1,8 +1,12 @@
-import tasks.*;
+import tasks.Epic;
+import tasks.Statuses;
+import tasks.SubTask;
+import tasks.Task;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.ArrayList;
+
 public class TaskManager {
     final HashMap<Short, SubTask> subTaskStorage;
     final HashMap<Short, Task> taskStorage;
@@ -25,19 +29,22 @@ public class TaskManager {
         subTaskStorage.put(subTask.id, subTask);
         Epic epicOfSubTask = getEpic(subTask.epicId);
         epicOfSubTask.subtasksIds.add(subTask.id);
+        setEpicStatus(epicOfSubTask.id);
     }
 
-    public void deleteSubTask(short id) {
+    public void deleteSubTask(Short id) {
         SubTask subTask = getSubTask(id);
         subTaskStorage.remove(id);
         short epicId = subTask.epicId;
         Epic epic = getEpic(epicId);
         epic.subtasksIds.remove(id);
+        setEpicStatus(epicId);
     }
 
     public void updateSubTask(SubTask subTask) {
         deleteSubTask(subTask.id);
         createSubTask(subTask);
+        setEpicStatus(subTask.epicId);
     }
 
     public Collection<SubTask> getSubTasksList() {
@@ -48,6 +55,7 @@ public class TaskManager {
         for (SubTask subTask : subTaskStorage.values()) {
             Epic epicOfSubTask = getEpic(subTask.epicId);
             epicOfSubTask.subtasksIds.clear();
+            setEpicStatus(epicOfSubTask.id);
         }
         subTaskStorage.clear();
     }
@@ -91,11 +99,18 @@ public class TaskManager {
 
     public void deleteEpic(short id) {
         Epic epic = getEpic(id);
-        epicStorage.remove(id);
 
+        int initialCapacity = 5;
+        ArrayList<Short> subtasksIdsCopy = new ArrayList<>(initialCapacity);
         for (short subTaskId : epic.subtasksIds) {
+            subtasksIdsCopy.add(subTaskId);
+        }
+
+        for (short subTaskId : subtasksIdsCopy) {
             deleteSubTask(subTaskId);
         }
+
+        epicStorage.remove(id);
     }
 
     public void updateEpic(Epic updatedEpic) {
@@ -103,13 +118,14 @@ public class TaskManager {
         updatedEpic.subtasksIds = oldEpic.subtasksIds;
         deleteEpic(updatedEpic.id);
         createEpic(updatedEpic);
+        setEpicStatus(updatedEpic.id);
     }
 
     public ArrayList<SubTask> subTasksOfEpic(short epicId) {
         int initialCapacity = 5;
         ArrayList<SubTask> result = new ArrayList<>(initialCapacity);
         Epic epic = getEpic(epicId);
-        for(Short subTaskId : epic.subtasksIds) {
+        for (Short subTaskId : epic.subtasksIds) {
             result.add(getSubTask(subTaskId));
         }
         return result;
@@ -118,7 +134,7 @@ public class TaskManager {
     private void setEpicStatus(short epicId) {
         Epic epic = getEpic(epicId);
 
-        if(epic.subtasksIds.isEmpty() || areAllSubTasksInStatus("NEW", epicId)) {
+        if (epic.subtasksIds.isEmpty() || areAllSubTasksInStatus("NEW", epicId)) {
             epic.status = Statuses.NEW;
         } else if (areAllSubTasksInStatus("DONE", epicId)) {
             epic.status = Statuses.DONE;
@@ -133,10 +149,10 @@ public class TaskManager {
         Statuses enumStatus = Statuses.valueOf(status);
 
         Epic epic = getEpic(epicId);
-        for(Short subTaskId : epic.subtasksIds) {
+        for (Short subTaskId : epic.subtasksIds) {
             SubTask subtask = getSubTask(subTaskId);
             Statuses enumStatusOfSubTask = subtask.status;
-            result = result && (enumStatus == enumStatusOfSubTask) ;
+            result = result && (enumStatus == enumStatusOfSubTask);
         }
         return result;
     }
@@ -149,7 +165,6 @@ public class TaskManager {
         subTaskStorage.clear();
         epicStorage.clear();
     }
-
 
 
 }
