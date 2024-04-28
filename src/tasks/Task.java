@@ -6,7 +6,7 @@ import java.util.Random;
 public class Task {
     private final static int INITIAL_CAPACITY = 20;
     private final static Random RANDOM_GENERATOR = new Random();
-    private static ArrayList<Short> idList = new ArrayList<>(INITIAL_CAPACITY);
+    private final static ArrayList<Short> ID_LIST = new ArrayList<>(INITIAL_CAPACITY);
     public  short id;
     public String title;
     public String description;
@@ -19,11 +19,11 @@ public class Task {
         this.status = Statuses.valueOf(status);
 
         short id = (short) RANDOM_GENERATOR.nextInt(Short.MAX_VALUE);
-        while (idList.contains(id)) {
+        while (ID_LIST.contains(id)) {
             id = (short) RANDOM_GENERATOR.nextInt();
         }
         this.id = id;
-        this.idList.add(id);
+        this.ID_LIST.add(id);
     }
 
     public Task(short id, String title, String description, String status) {
@@ -50,11 +50,7 @@ public class Task {
         }
         Task task = (Task) o;
 
-        if (this.id == task.id) {
-            return true;
-        } else {
-            return false;
-        }
+        return  (this.id == task.id);
     }
     @Override
     public int hashCode() {
