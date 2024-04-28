@@ -14,9 +14,7 @@ public class Task {
 
 
     public Task(String title, String description, String status) {
-        this.title = title;
-        this.description = description;
-        this.status = Statuses.valueOf(status);
+        this.multipleSetter(title, description, status);
 
         short id = (short) RANDOM_GENERATOR.nextInt(Short.MAX_VALUE);
         while (ID_LIST.contains(id)) {
@@ -27,11 +25,15 @@ public class Task {
     }
 
     public Task(short id, String title, String description, String status) {
+        this.multipleSetter(title, description, status);
+
+        this.id = id;
+    }
+
+    private void multipleSetter(String title, String description, String status) {
         this.title = title;
         this.description = description;
         this.status = Statuses.valueOf(status);
-
-        this.id = id;
     }
 
 
@@ -57,10 +59,3 @@ public class Task {
         return id;
     }
 }
-
-enum Statuses {
-    NEW,
-    IN_PROGRESS,
-    DONE
-}
-
