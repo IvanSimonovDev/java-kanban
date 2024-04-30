@@ -4,7 +4,6 @@ import tasks.SubTask;
 import tasks.Task;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 
 public class TaskManager {
@@ -13,10 +12,9 @@ public class TaskManager {
     final HashMap<Short, Epic> epicStorage;
 
     public TaskManager() {
-        int initialCapacity = 10;
-        subTaskStorage = new HashMap<>(initialCapacity);
-        taskStorage = new HashMap<>(initialCapacity);
-        epicStorage = new HashMap<>(initialCapacity);
+        subTaskStorage = new HashMap<>();
+        taskStorage = new HashMap<>();
+        epicStorage = new HashMap<>();
     }
 
     //methods for SubTask
@@ -42,13 +40,12 @@ public class TaskManager {
     }
 
     public void updateSubTask(SubTask subTask) {
-        deleteSubTask(subTask.id);
-        createSubTask(subTask);
+        subTaskStorage.put(subTask.id, subTask);
         setEpicStatus(subTask.epicId);
     }
 
-    public Collection<SubTask> getSubTasksList() {
-        return subTaskStorage.values();
+    public ArrayList<SubTask> getSubTasksList() {
+        return new ArrayList<>(subTaskStorage.values());
     }
 
     public void deleteAllSubTasks() {
@@ -79,8 +76,8 @@ public class TaskManager {
         createTask(updatedTask);
     }
 
-    public Collection<Task> getTasksList() {
-        return taskStorage.values();
+    public ArrayList<Task> getTasksList() {
+        return new ArrayList<>(taskStorage.values());
     }
 
     public void deleteAllTasks() {
@@ -98,27 +95,15 @@ public class TaskManager {
     }
 
     public void deleteEpic(short id) {
-        Epic epic = getEpic(id);
+        Epic epic = epicStorage.remove(id);
 
-        int initialCapacity = 5;
-        ArrayList<Short> subtasksIdsCopy = new ArrayList<>(initialCapacity);
         for (short subTaskId : epic.subtasksIds) {
-            subtasksIdsCopy.add(subTaskId);
+            subTaskStorage.remove(subTaskId);
         }
-
-        for (short subTaskId : subtasksIdsCopy) {
-            deleteSubTask(subTaskId);
-        }
-
-        epicStorage.remove(id);
     }
 
     public void updateEpic(Epic updatedEpic) {
-        Epic oldEpic = getEpic(updatedEpic.id);
-        updatedEpic.subtasksIds = oldEpic.subtasksIds;
-        deleteEpic(updatedEpic.id);
-        createEpic(updatedEpic);
-        setEpicStatus(updatedEpic.id);
+        epicStorage.put(updatedEpic.id, updatedEpic);
     }
 
     public ArrayList<SubTask> subTasksOfEpic(short epicId) {
@@ -157,8 +142,8 @@ public class TaskManager {
         return result;
     }
 
-    public Collection<Epic> getEpicsList() {
-        return epicStorage.values();
+    public ArrayList<Epic> getEpicsList() {
+        return new ArrayList<>(epicStorage.values());
     }
 
     public void deleteAllEpics() {
