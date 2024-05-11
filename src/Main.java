@@ -6,48 +6,48 @@ import tasks.Task;
 public class Main {
 
     public static void main(String[] args) {
-        TaskManager taskManager = new TaskManager();
+        TaskManager inMemoryTaskManager = new InMemoryTaskManager();
 
-        // Создание 2-х задач и занесение их в TaskManager
+        // Создание 2-х задач и занесение их в inMemoryTaskManager
         Task taskFst = new Task("Task_1", "Description_1", "NEW");
         Task taskSnd = new Task("Task_2", "Description_2", "NEW");
-        taskManager.createTask(taskFst);
-        taskManager.createTask(taskSnd);
+        inMemoryTaskManager.createTask(taskFst);
+        inMemoryTaskManager.createTask(taskSnd);
 
 
-        // Создание первого эпика и 2-х его подзадач + занесение их в TaskManager
+        // Создание первого эпика и 2-х его подзадач + занесение их в inMemoryTaskManager
         Epic epicFst = new Epic("Epic_1", "Description_3", "NEW");
         SubTask subTaskFst = new SubTask("SubTask_1", "Description_4", "NEW", epicFst.id);
         SubTask subTaskSnd = new SubTask("SubTask_2", "Description_5", "NEW", epicFst.id);
-        taskManager.createEpic(epicFst);
-        taskManager.createSubTask(subTaskFst);
-        taskManager.createSubTask(subTaskSnd);
+        inMemoryTaskManager.createEpic(epicFst);
+        inMemoryTaskManager.createSubTask(subTaskFst);
+        inMemoryTaskManager.createSubTask(subTaskSnd);
 
-        // Создание второго эпика и его подзадачи + занесение их в TaskManager
+        // Создание второго эпика и его подзадачи + занесение их в inMemoryTaskManager
         Epic epicSnd = new Epic("Epic_2", "Description_6", "NEW");
         SubTask subTaskThd = new SubTask("SubTask_3", "Description_7", "NEW", epicSnd.id);
-        taskManager.createEpic(epicSnd);
-        taskManager.createSubTask(subTaskThd);
+        inMemoryTaskManager.createEpic(epicSnd);
+        inMemoryTaskManager.createSubTask(subTaskThd);
 
         // Печать списков эпиков, задач и подзадач
-        System.out.println(taskManager.getEpicsList());
-        System.out.println(taskManager.getTasksList());
-        System.out.println(taskManager.getSubTasksList());
+        System.out.println(inMemoryTaskManager.getEpicsList());
+        System.out.println(inMemoryTaskManager.getTasksList());
+        System.out.println(inMemoryTaskManager.getSubTasksList());
 
         //Изменение статусов созданных объектов, печать статусов
         // 1) Изменение статусов taskFst и taskSnd
         taskFst.status = Statuses.IN_PROGRESS;
-        taskManager.updateTask(taskFst);
+        inMemoryTaskManager.updateTask(taskFst);
         taskSnd.status = Statuses.DONE;
-        taskManager.updateTask(taskSnd);
+        inMemoryTaskManager.updateTask(taskSnd);
 
         // 2) Изменение статусов subTaskFst, subTaskSnd, subTaskThd
         subTaskFst.status = Statuses.IN_PROGRESS;
-        taskManager.updateSubTask(subTaskFst);
+        inMemoryTaskManager.updateSubTask(subTaskFst);
         subTaskSnd.status = Statuses.DONE;
-        taskManager.updateSubTask(subTaskSnd);
+        inMemoryTaskManager.updateSubTask(subTaskSnd);
         subTaskThd.status = Statuses.DONE;
-        taskManager.updateSubTask(subTaskThd);
+        inMemoryTaskManager.updateSubTask(subTaskThd);
 
         // 3) Печать статусов всех созданных подзадач/задач/эпиков
         System.out.println(taskFst.status);
@@ -59,12 +59,26 @@ public class Main {
         System.out.println(epicSnd.status);
 
         //Пробуем удалить одну из задач и один из эпиков.
-        taskManager.deleteTask(taskFst.id);
-        taskManager.deleteEpic(epicFst.id);
+        inMemoryTaskManager.deleteTask(taskFst.id);
+        inMemoryTaskManager.deleteEpic(epicFst.id);
 
-        System.out.println(taskManager.getSubTasksList());
-        System.out.println(taskManager.getTasksList());
-        System.out.println(taskManager.getEpicsList());
+        System.out.println(inMemoryTaskManager.getSubTasksList());
+        System.out.println(inMemoryTaskManager.getTasksList());
+        System.out.println(inMemoryTaskManager.getEpicsList());
+
+        inMemoryTaskManager.getTask(inMemoryTaskManager.getTasksList().getFirst().id);
+        inMemoryTaskManager.getTask(inMemoryTaskManager.getTasksList().getLast().id);
+
+        inMemoryTaskManager.getSubTask(inMemoryTaskManager.getSubTasksList().getFirst().id);
+        inMemoryTaskManager.getSubTask(inMemoryTaskManager.getSubTasksList().getLast().id);
+
+        inMemoryTaskManager.getEpic(inMemoryTaskManager.getEpicsList().getFirst().id);
+        inMemoryTaskManager.getEpic(inMemoryTaskManager.getEpicsList().getLast().id);
+
+        System.out.println(inMemoryTaskManager.getHistory());
+        System.out.println(inMemoryTaskManager.getHistory());
+
+
 
 
     }
