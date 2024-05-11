@@ -6,7 +6,7 @@ import tasks.Task;
 public class Main {
 
     public static void main(String[] args) {
-        TaskManager inMemoryTaskManager = new InMemoryTaskManager();
+        TaskManager inMemoryTaskManager = Managers.getDefault();
 
         // Создание 2-х задач и занесение их в inMemoryTaskManager
         Task taskFst = new Task("Task_1", "Description_1", "NEW");
@@ -75,8 +75,7 @@ public class Main {
         inMemoryTaskManager.getEpic(inMemoryTaskManager.getEpicsList().getFirst().id);
         inMemoryTaskManager.getEpic(inMemoryTaskManager.getEpicsList().getLast().id);
 
-        System.out.println(inMemoryTaskManager.getHistory());
-        System.out.println(inMemoryTaskManager.getHistory());
+        System.out.println( inMemoryTaskManager.getHistoryManager().getHistory() );
 
 
 

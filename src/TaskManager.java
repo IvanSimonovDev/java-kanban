@@ -2,7 +2,6 @@ import tasks.Epic;
 import tasks.SubTask;
 import tasks.Task;
 
-import java.util.List;
 import java.util.ArrayList;
 
 public interface TaskManager {
@@ -51,7 +50,6 @@ public interface TaskManager {
     void deleteAllEpics();
 
     //general method
-
-    List<Task> getHistory();
+    HistoryManager getHistoryManager();
 
 }

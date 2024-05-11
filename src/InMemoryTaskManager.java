@@ -1,7 +1,9 @@
-import tasks.*;
+import tasks.Epic;
+import tasks.Statuses;
+import tasks.SubTask;
+import tasks.Task;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.HashMap;
 
 public class InMemoryTaskManager implements TaskManager {
@@ -9,14 +11,13 @@ public class InMemoryTaskManager implements TaskManager {
     final HashMap<Short, Task> taskStorage;
     final HashMap<Short, Epic> epicStorage;
 
-    final ArrayList<Task> historyStorage;
-    final static int MAX_ELEMENTS_IN_HISTORY = 10;
+    private final HistoryManager historyManager;
 
     public InMemoryTaskManager() {
         subTaskStorage = new HashMap<>();
         taskStorage = new HashMap<>();
         epicStorage = new HashMap<>();
-        historyStorage = new ArrayList<>();
+        historyManager = new InMemoryHistoryManager();
     }
 
     //methods for SubTask
@@ -24,7 +25,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public SubTask getSubTask(short id) {
         SubTask subTask = subTaskStorage.get(id);
-        addToHistory(subTask);
+        historyManager.add(subTask);
         return subTask;
     }
 
@@ -72,7 +73,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Task getTask(short id) {
         Task task = taskStorage.get(id);
-        addToHistory(task);
+        historyManager.add(task);
         return task;
     }
 
@@ -107,7 +108,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Epic getEpic(short id) {
         Epic epic = epicStorage.get(id);
-        addToHistory(epic);
+        historyManager.add(epic);
         return epic;
     }
 
@@ -178,19 +179,9 @@ public class InMemoryTaskManager implements TaskManager {
         epicStorage.clear();
     }
 
-    //general method
-
     @Override
-    public List<Task> getHistory() {
-        return historyStorage;
+    public HistoryManager getHistoryManager() {
+        return this.historyManager;
     }
-
-    public void addToHistory(Task watchedTask) {
-        historyStorage.add(watchedTask);
-        if (historyStorage.size() > MAX_ELEMENTS_IN_HISTORY) {
-            historyStorage.removeFirst();
-        }
-    }
-
 
 }
