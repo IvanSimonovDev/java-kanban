@@ -18,7 +18,7 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void add(Task watchedTask) {
-        historyStorage.add(watchedTask);
+        historyStorage.add(watchedTask.clone());
         if (historyStorage.size() > MAX_ELEMENTS_IN_HISTORY) {
             historyStorage.removeFirst();
         }

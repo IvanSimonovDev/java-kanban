@@ -13,5 +13,10 @@ public class SubTask extends Task {
         this.epicId = epicId;
     }
 
+    @Override
+    public SubTask clone() {
+        return new SubTask(this.id, this.title, this.description, this.status.toString(), this.epicId);
+    }
+
 
 }

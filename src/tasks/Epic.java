@@ -19,5 +19,11 @@ public class Epic extends Task {
         int initialCapacity = 7;
         this.subtasksIds = new ArrayList<>(initialCapacity);
     }
+    @Override
+    public Epic clone() {
+        Epic result =  new Epic(this.id, this.title, this.description, this.status.toString());
+        result.subtasksIds = (ArrayList<Short>) this.subtasksIds.clone();
+        return result;
+    }
 
 }

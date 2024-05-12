@@ -21,7 +21,7 @@ public class Task {
             id = (short) RANDOM_GENERATOR.nextInt();
         }
         this.id = id;
-        this.ID_LIST.add(id);
+        Task.ID_LIST.add(id);
     }
 
     public Task(short id, String title, String description, String status) {
@@ -58,5 +58,10 @@ public class Task {
     @Override
     public int hashCode() {
         return id;
+    }
+
+    @Override
+    public Task clone() {
+        return new Task(this.id, this.title, this.description, this.status.toString());
     }
 }
