@@ -78,8 +78,5 @@ class InMemoryTaskManagerTest {
         Assertions.assertTrue(condition);
     }
 
-    
-
-
 
 }

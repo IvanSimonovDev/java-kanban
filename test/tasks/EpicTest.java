@@ -4,22 +4,18 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-
-import static org.junit.jupiter.api.Assertions.*;
-
 class EpicTest {
     String title;
     String description;
     String status;
-    
+
     @BeforeEach
     public void settingParametersForEpic() {
         title = "Epic_1";
         description = "Description_1";
         status = "NEW";
     }
-    
+
     @Test
     public void constructorWithoutIdShouldWork() {
         Epic epic = new Epic(title, description, status);
@@ -67,6 +63,5 @@ class EpicTest {
         Assertions.assertTrue(condition);
     }
 
-   
 
 }

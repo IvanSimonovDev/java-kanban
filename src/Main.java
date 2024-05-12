@@ -75,9 +75,7 @@ public class Main {
         inMemoryTaskManager.getEpic(inMemoryTaskManager.getEpicsList().getFirst().id);
         inMemoryTaskManager.getEpic(inMemoryTaskManager.getEpicsList().getLast().id);
 
-        System.out.println( inMemoryTaskManager.getHistoryManager().getHistory() );
-
-
+        System.out.println(inMemoryTaskManager.getHistoryManager().getHistory());
 
 
     }

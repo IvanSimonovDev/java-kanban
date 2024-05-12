@@ -48,7 +48,7 @@ class TaskTest {
 
         Assertions.assertEquals(taskFst, taskSnd);
     }
-    
+
     @Test
     public void hashCodeShouldBeEqualToId() {
         short id = 100;
