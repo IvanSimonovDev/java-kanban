@@ -6,11 +6,11 @@ import org.junit.jupiter.api.Test;
 
 class SubTaskTest {
 
-    String title;
-    String description;
-    String status;
+    private String title;
+    private String description;
+    private String status;
 
-    short epicId;
+    private short epicId;
 
     @BeforeEach
     public void settingParametersForSubTask() {

@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    final List<Task> historyStorage;
-    final static int MAX_ELEMENTS_IN_HISTORY = 10;
+    private final List<Task> historyStorage;
+    private final static int MAX_ELEMENTS_IN_HISTORY = 10;
 
     public InMemoryHistoryManager() {
         historyStorage = new ArrayList<>();
@@ -18,9 +18,11 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void add(Task watchedTask) {
-        historyStorage.add(watchedTask.clone());
-        if (historyStorage.size() > MAX_ELEMENTS_IN_HISTORY) {
-            historyStorage.removeFirst();
+        if (watchedTask != null) {
+            historyStorage.add(watchedTask.clone());
+            if (historyStorage.size() > MAX_ELEMENTS_IN_HISTORY) {
+                historyStorage.removeFirst();
+            }
         }
     }
 }

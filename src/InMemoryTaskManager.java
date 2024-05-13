@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class InMemoryTaskManager implements TaskManager {
-    final HashMap<Short, SubTask> subTaskStorage;
-    final HashMap<Short, Task> taskStorage;
-    final HashMap<Short, Epic> epicStorage;
+    private final HashMap<Short, SubTask> subTaskStorage;
+    private final HashMap<Short, Task> taskStorage;
+    private final HashMap<Short, Epic> epicStorage;
 
     private final HistoryManager historyManager;
 

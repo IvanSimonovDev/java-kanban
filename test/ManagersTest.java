@@ -10,9 +10,10 @@ class ManagersTest {
     public void InMemoryTaskManagerCorrectlyInitialized() {
         InMemoryTaskManager inMemoryTaskManager = (InMemoryTaskManager) Managers.getDefault();
 
-        boolean condition = inMemoryTaskManager.subTaskStorage.isEmpty() && inMemoryTaskManager.taskStorage.isEmpty() &&
-                inMemoryTaskManager.epicStorage.isEmpty() && (inMemoryTaskManager.getHistoryManager().getClass() ==
-                InMemoryHistoryManager.class);
+        boolean condition = inMemoryTaskManager.getSubTasksList().isEmpty() &&
+                inMemoryTaskManager.getTasksList().isEmpty() &&
+                inMemoryTaskManager.getEpicsList().isEmpty() &&
+                (inMemoryTaskManager.getHistoryManager().getClass() == InMemoryHistoryManager.class);
 
         Assertions.assertTrue(condition);
     }
@@ -21,7 +22,7 @@ class ManagersTest {
     public void InMemoryHistoryManagerCorrectlyInitialized() {
         InMemoryHistoryManager inMemoryHistoryManager = (InMemoryHistoryManager) Managers.getDefaultHistory();
 
-        boolean condition = inMemoryHistoryManager.historyStorage.isEmpty();
+        boolean condition = inMemoryHistoryManager.getHistory().isEmpty();
 
         Assertions.assertTrue(condition);
     }
@@ -46,7 +47,7 @@ class ManagersTest {
 
         inMemoryHistoryManager.add(taskFst);
 
-        Assertions.assertTrue(inMemoryHistoryManager.historyStorage.contains(taskFst));
+        Assertions.assertTrue(inMemoryHistoryManager.getHistory().contains(taskFst));
     }
 
 

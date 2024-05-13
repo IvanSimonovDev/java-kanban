@@ -5,9 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 
 class TaskTest {
-    String title;
-    String description;
-    String status;
+    private String title;
+    private String description;
+    private String status;
 
     @BeforeEach
     public void settingParametersForTask() {

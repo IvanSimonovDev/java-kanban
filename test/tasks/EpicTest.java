@@ -5,9 +5,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class EpicTest {
-    String title;
-    String description;
-    String status;
+    private String title;
+    private String description;
+    private String status;
 
     @BeforeEach
     public void settingParametersForEpic() {
