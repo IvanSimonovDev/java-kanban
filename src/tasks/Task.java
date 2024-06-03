@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class Task {
-    private final static int INITIAL_CAPACITY = 20;
-    private final static Random RANDOM_GENERATOR = new Random();
-    public final static ArrayList<Short> ID_LIST = new ArrayList<>(INITIAL_CAPACITY);
+    private static final int INITIAL_CAPACITY = 20;
+    private static final Random RANDOM_GENERATOR = new Random();
+    public static final ArrayList<Short> ID_LIST = new ArrayList<>(INITIAL_CAPACITY);
     public short id;
     public String title;
     public String description;
