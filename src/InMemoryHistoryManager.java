@@ -4,25 +4,33 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    private final List<Task> historyStorage;
-    private final static int MAX_ELEMENTS_IN_HISTORY = 10;
+    private final DoublyLinkedList<Short, Task> historyStorage;
 
     public InMemoryHistoryManager() {
-        historyStorage = new ArrayList<>();
+        historyStorage = new DoublyLinkedList<>();
     }
 
     @Override
     public List<Task> getHistory() {
-        return historyStorage;
+        DoublyLinkedList<Short, Task>.Node<Task> currentNode = historyStorage.getHead();
+        ArrayList<Task> result = new ArrayList<>(historyStorage.size());
+
+        while (currentNode != null) {
+            result.add(currentNode.getValue());
+            currentNode = currentNode.getNextNode();
+        }
+        return result;
     }
 
     @Override
     public void add(Task watchedTask) {
         if (watchedTask != null) {
-            historyStorage.add(watchedTask.clone());
-            if (historyStorage.size() > MAX_ELEMENTS_IN_HISTORY) {
-                historyStorage.removeFirst();
-            }
+            historyStorage.addFirst(watchedTask.id, watchedTask.clone());
         }
+    }
+
+    @Override
+    public void remove(short id) {
+        historyStorage.remove(id);
     }
 }
