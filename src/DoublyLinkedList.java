@@ -36,6 +36,15 @@ public class DoublyLinkedList<K, V> {
         public void setValue(E value) {
             this.value = value;
         }
+
+        public boolean equals(Object o) {
+            if ((o == null) || (this.getClass() != o.getClass())) {
+                return false;
+            } else {
+                Node<E> transformedNode = (Node<E>) o;
+                return (this.getValue().equals(transformedNode.getValue()));
+            }
+        }
     }
 
     private Node<V> head;

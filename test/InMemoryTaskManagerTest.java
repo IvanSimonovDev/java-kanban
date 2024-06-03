@@ -1,8 +1,12 @@
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import tasks.*;
+import tasks.Epic;
+import tasks.Statuses;
+import tasks.SubTask;
+import tasks.Task;
 
+import java.util.ArrayList;
 import java.util.List;
 
 class InMemoryTaskManagerTest {
@@ -76,6 +80,101 @@ class InMemoryTaskManagerTest {
                 (task.description.equals(returnedTask.description)) && (task.status.equals(returnedTask.status));
 
         Assertions.assertTrue(condition);
+    }
+
+    @Test
+    public void epicShouldNotContainDeletedSubTask() {
+
+        Epic epicOfSubTask = new Epic("Epic_1", "Description of Epic_1", "NEW");
+        SubTask subTask = new SubTask("SubTask_1", "Description of SubTask_1", "NEW", epicOfSubTask.id);
+
+        inMemoryTaskManager.createEpic(epicOfSubTask);
+        inMemoryTaskManager.createSubTask(subTask);
+        inMemoryTaskManager.deleteSubTask(subTask.id);
+
+        Assertions.assertTrue(epicOfSubTask.subtasksIds.isEmpty());
+
+    }
+
+    @Test
+    public void epicFieldsCanChangeOutsideOfTaskManager() {
+        short epicId = 22;
+        Epic epic = new Epic(epicId, "Epic_1", "Description of Epic_1", "NEW");
+
+        short newEpicId = 11;
+        String newEpicTitle = "Epic_2";
+        String newEpicDescription = "Description of Epic_2";
+        Statuses newEpicStatus = Statuses.IN_PROGRESS;
+        ArrayList<Short> newSubtasksIds = new ArrayList<>(List.of(epicId));
+
+        epic.id = newEpicId;
+        epic.title = newEpicTitle;
+        epic.description = newEpicDescription;
+        epic.status = newEpicStatus;
+        epic.subtasksIds = newSubtasksIds;
+
+        boolean conditionFst = (epic.id == newEpicId);
+        boolean conditionSnd = (epic.title.equals(newEpicTitle));
+        boolean conditionThd = (epic.description.equals(newEpicDescription));
+        boolean conditionFth = (epic.status == newEpicStatus);
+        boolean conditionFifth = (epic.subtasksIds.equals(newSubtasksIds));
+
+        Assertions.assertTrue(conditionFst && conditionSnd && conditionThd && conditionFth && conditionFifth);
+
+    }
+
+    @Test
+    public void subTaskFieldsCanChangeOutsideOfTaskManager() {
+        short subTaskId = 22;
+        short epicId = 33;
+        SubTask subTask = new SubTask(subTaskId, "SubTask_1", "Description of SubTask_1",
+                "NEW", epicId);
+
+        short newSubTaskId = 11;
+        String newSubTaskTitle = "SubTask_2";
+        String newSubTaskDescription = "Description of SubTask_2";
+        Statuses newSubTaskStatus = Statuses.IN_PROGRESS;
+        short newEpicId = 44;
+
+        subTask.id = newSubTaskId;
+        subTask.title = newSubTaskTitle;
+        subTask.description = newSubTaskDescription;
+        subTask.status = newSubTaskStatus;
+        subTask.epicId = newEpicId;
+
+        boolean conditionFst = (subTask.id == newSubTaskId);
+        boolean conditionSnd = (subTask.title.equals(newSubTaskTitle));
+        boolean conditionThd = (subTask.description.equals(newSubTaskDescription));
+        boolean conditionFth = (subTask.status == newSubTaskStatus);
+        boolean conditionFifth = (subTask.epicId == newEpicId);
+
+        Assertions.assertTrue(conditionFst && conditionSnd && conditionThd && conditionFth && conditionFifth);
+
+    }
+
+    @Test
+    public void taskFieldsCanChangeOutsideOfTaskManager() {
+        short taskId = 22;
+        Task task = new Task(taskId, "Task_1", "Description of Task_1",
+                "NEW");
+
+        short newTaskId = 11;
+        String newTaskTitle = "Task_2";
+        String newTaskDescription = "Description of Task_2";
+        Statuses newTaskStatus = Statuses.IN_PROGRESS;
+
+        task.id = newTaskId;
+        task.title = newTaskTitle;
+        task.description = newTaskDescription;
+        task.status = newTaskStatus;
+
+        boolean conditionFst = (task.id == newTaskId);
+        boolean conditionSnd = (task.title.equals(newTaskTitle));
+        boolean conditionThd = (task.description.equals(newTaskDescription));
+        boolean conditionFth = (task.status == newTaskStatus);
+
+        Assertions.assertTrue(conditionFst && conditionSnd && conditionThd && conditionFth);
+
     }
 
 
