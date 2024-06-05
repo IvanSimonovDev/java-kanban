@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    private final DoublyLinkedList<Short, Task> historyStorage;
+    private final DoublyLinkedList<Task> historyStorage;
 
     public InMemoryHistoryManager() {
         historyStorage = new DoublyLinkedList<>();
@@ -12,8 +12,8 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public List<Task> getHistory() {
-        DoublyLinkedList<Short, Task>.Node<Task> currentNode = historyStorage.getHead();
-        ArrayList<Task> result = new ArrayList<>(historyStorage.size());
+        DoublyLinkedList<Task>.Node<Task> currentNode = historyStorage.getHead();
+        List<Task> result = new ArrayList<>(historyStorage.size());
 
         while (currentNode != null) {
             result.add(currentNode.getValue());
@@ -25,7 +25,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     @Override
     public void add(Task watchedTask) {
         if (watchedTask != null) {
-            historyStorage.addFirst(watchedTask.id, watchedTask.clone());
+            historyStorage.addFirst(watchedTask.clone());
         }
     }
 

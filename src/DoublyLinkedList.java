@@ -1,8 +1,10 @@
+import tasks.Task;
+
 import java.util.HashMap;
 import java.util.Map;
 
-public class DoublyLinkedList<K, V> {
-    class Node<E> {
+public class DoublyLinkedList<T extends Task> {
+    class Node<E extends Task> {
         private Node<E> nextNode;
         private Node<E> prevNode;
         private E value;
@@ -47,10 +49,10 @@ public class DoublyLinkedList<K, V> {
         }
     }
 
-    private Node<V> head;
-    private Node<V> tail;
+    private Node<T> head;
+    private Node<T> tail;
 
-    private final Map<K, Node<V>> innerMap;
+    private final Map<Short, Node<T>> innerMap;
     private int size;
 
     public DoublyLinkedList() {
@@ -58,11 +60,11 @@ public class DoublyLinkedList<K, V> {
         this.innerMap = new HashMap<>();
     }
 
-    public Node<V> getHead() {
+    public Node<T> getHead() {
         return head;
     }
 
-    public Node<V> getTail() {
+    public Node<T> getTail() {
         return tail;
     }
 
@@ -70,45 +72,45 @@ public class DoublyLinkedList<K, V> {
         return size;
     }
 
-    public void addLast(K key, V value) {
+    public void addLast(T task) {
 
-        if (innerMap.containsKey(key)) {
-            remove(key);
+        if (innerMap.containsKey(task.id)) {
+            remove(task.id);
         }
 
         if (this.head == null) {
-            this.head = new Node<>(null, value, null);
+            this.head = new Node<>(null, task, null);
             this.tail = head;
         } else {
-            this.tail.setNextNode(new Node<>(tail, value, null));
+            this.tail.setNextNode(new Node<>(tail, task, null));
             this.tail = tail.getNextNode();
         }
-        this.innerMap.put(key, tail);
+        this.innerMap.put(task.id, tail);
         this.size++;
     }
 
-    public void addFirst(K key, V value) {
-        if (innerMap.containsKey(key)) {
-            remove(key);
+    public void addFirst(T task) {
+        if (innerMap.containsKey(task.id)) {
+            remove(task.id);
         }
 
         if (this.head == null) {
-            this.head = new Node<>(null, value, null);
+            this.head = new Node<>(null, task, null);
             this.tail = head;
         } else {
-            this.head.setPrevNode(new Node<>(null, value, head));
+            this.head.setPrevNode(new Node<>(null, task, head));
             this.head = head.getPrevNode();
         }
-        this.innerMap.put(key, head);
+        this.innerMap.put(task.id, head);
         this.size++;
     }
 
-    public V remove(K key) {
-        Node<V> nodeToRemove = innerMap.remove(key);
+    public T remove(Short taskId) {
+        Node<T> nodeToRemove = innerMap.remove(taskId);
 
         if (nodeToRemove != null) {
-            Node<V> prevNode = nodeToRemove.getPrevNode();
-            Node<V> nextNode = nodeToRemove.getNextNode();
+            Node<T> prevNode = nodeToRemove.getPrevNode();
+            Node<T> nextNode = nodeToRemove.getNextNode();
 
             if (prevNode != null && nextNode != null) {
                 prevNode.setNextNode(nextNode);
