@@ -63,5 +63,4 @@ class EpicTest {
         Assertions.assertTrue(condition);
     }
 
-
 }
