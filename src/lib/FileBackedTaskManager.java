@@ -7,34 +7,37 @@ import lib.tasks.Task;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.Files;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class FileBackedTaskManager extends InMemoryTaskManager implements TaskManager {
 
-    private static final String defaultFileStorageStringPath = "resources/file_storage.csv";
-    private static final Path defaultFileStoragePath = Paths.get(defaultFileStorageStringPath);
+    private static final String FILE_DATA_FORMAT = "id,type,title,description,status,epicId";
+    private static final String DEFAULT_FILE_STORAGE_STRING_PATH = "resources/file_storage.csv";
+    private final File storage;
 
     public FileBackedTaskManager() {
         super();
-        this.loadData(defaultFileStoragePath);
+        this.storage = new File(DEFAULT_FILE_STORAGE_STRING_PATH);
+        this.loadData();
     }
 
-    public FileBackedTaskManager(Path fileStoragePath) {
+    public FileBackedTaskManager(File storage) {
         super();
-        this.loadData(fileStoragePath);
+        this.storage = storage;
+        this.loadData();
     }
 
     public static FileBackedTaskManager loadFromFile(File file) {
-        Path fileStoragePath = file.toPath();
-        return  new FileBackedTaskManager(fileStoragePath);
+        return new FileBackedTaskManager(file);
     }
 
-    public static Path getDefaultFileStoragePath() {
-        return defaultFileStoragePath;
+    public static String getDefaultFileStorageStringPath() {
+        return DEFAULT_FILE_STORAGE_STRING_PATH;
+    }
+
+    public static String getFileDataFormat() {
+        return FILE_DATA_FORMAT;
     }
 
     @Override
@@ -112,8 +115,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
 
     private void save() {
         try (BufferedWriter bufferedWriter =
-                     new BufferedWriter(new FileWriter(defaultFileStoragePath.toString(), StandardCharsets.UTF_8,
-                             true))) {
+                     new BufferedWriter(new FileWriter(storage, StandardCharsets.UTF_8))) {
+            bufferedWriter.write(FILE_DATA_FORMAT + "\n");
             saveEveryTask(bufferedWriter);
 
         } catch (IOException e) {
@@ -135,16 +138,16 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
             switch (canonicalName) {
                 case "lib.tasks.Task":
                     output = String.join(",", String.valueOf(task.id), "Task",
-                            task.title, task.description, task.status.toString(), "-");
+                            task.title, task.description, task.status.toString(), "-", "\n");
                     break;
                 case "lib.tasks.Epic":
                     output = String.join(",", String.valueOf(task.id), "Epic",
-                            task.title, task.description, task.status.toString(), "-");
+                            task.title, task.description, task.status.toString(), "-", "\n");
                     break;
                 case "lib.tasks.SubTask":
                     SubTask subTask = (SubTask) task;
                     output = String.join(",", String.valueOf(subTask.id), "SubTask", subTask.title,
-                            subTask.description, subTask.status.toString(), String.valueOf(subTask.epicId));
+                            subTask.description, subTask.status.toString(), String.valueOf(subTask.epicId), "\n");
                     break;
             }
 
@@ -154,15 +157,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         }
     }
 
-    public void loadData(Path defaultFileStoragePath) {
+    public void loadData() {
 
         try {
 
-            if (!Files.exists(defaultFileStoragePath)) {
-                FileWriter fileWriter = new FileWriter(defaultFileStorageStringPath, StandardCharsets.UTF_8);
-                String dataFormat = "id,type,title,description,status,epicId";
+            if (!storage.exists()) {
+                FileWriter fileWriter = new FileWriter(storage, StandardCharsets.UTF_8);
 
-                fileWriter.write(dataFormat);
+                fileWriter.write(FILE_DATA_FORMAT);
                 fileWriter.close();
             } else {
                 loadDataFromFile();
@@ -179,7 +181,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
 
     private void loadDataFromFile() throws IOException {
         try (BufferedReader bufferedReader =
-                     new BufferedReader(new FileReader(defaultFileStoragePath.toString(), StandardCharsets.UTF_8))) {
+                     new BufferedReader(new FileReader(storage, StandardCharsets.UTF_8))) {
             // Первую строку пропускаем - там задан формат.
             bufferedReader.readLine();
             while (bufferedReader.ready()) {

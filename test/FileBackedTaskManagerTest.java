@@ -1,23 +1,28 @@
 import lib.FileBackedTaskManager;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import lib.tasks.Epic;
 import lib.tasks.Statuses;
 import lib.tasks.SubTask;
 import lib.tasks.Task;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
 class FileBackedTaskManagerTest {
     private static FileBackedTaskManager fileBackedTaskManager;
+    private static File fileStorage;
+    private static FileWriter fileWriter;
 
     @BeforeEach
-    public void taskManagerCreation() throws IOException {
-        Files.deleteIfExists(FileBackedTaskManager.getDefaultFileStoragePath());
+    public void taskManagerCreation()  {
+        File defaultStorage = new File(FileBackedTaskManager.getDefaultFileStorageStringPath());
+        defaultStorage.delete();
         fileBackedTaskManager = new FileBackedTaskManager();
     }
 
@@ -179,6 +184,74 @@ class FileBackedTaskManagerTest {
 
         Assertions.assertTrue(conditionFst && conditionSnd && conditionThd && conditionFth);
 
+    }
+
+    @Test
+    public void shouldGetNoTasksFromEmptyFile() throws IOException {
+
+        initializeEmptyFileStorageAndManager();
+
+
+        boolean conditionFst = fileBackedTaskManager.getTasksList().isEmpty();
+        boolean conditionSnd = fileBackedTaskManager.getSubTasksList().isEmpty();
+        boolean conditionThd = fileBackedTaskManager.getEpicsList().isEmpty();
+
+        Assertions.assertTrue(conditionFst && conditionSnd && conditionThd);
+
+
+    }
+
+    @Test
+    public void shouldBeNoTasksInFileWhenManagerIsEmpty() throws IOException {
+        initializeEmptyFileStorageAndManager();
+        long emptyFileStorageSize = fileStorage.length();
+
+        short taskId = 22;
+        Task task = new Task(taskId, "Task_1", "Description of Task_1", "NEW");
+        fileBackedTaskManager.createTask(task);
+        fileBackedTaskManager.deleteTask(taskId);
+
+        boolean conditionFst = fileBackedTaskManager.getTasksList().isEmpty();
+        boolean conditionSnd = (fileStorage.length() == emptyFileStorageSize);
+
+        Assertions.assertTrue(conditionFst && conditionSnd);
+
+
+    }
+
+    @Test
+    public void taskManagerShouldSaveAndLoadMoreThanOneTask() throws IOException {
+        initializeEmptyFileStorageAndManager();
+
+        short taskFstId = 22;
+        short taskSndId = 23;
+        short taskThdId = 24;
+
+        Task taskFst = new Task(taskFstId, "Task_1", "Description of Task_1", "NEW");
+        Task taskSnd = new Task(taskSndId, "Task_2", "Description of Task_2", "NEW");
+        Task taskThd = new Task(taskThdId, "Task_3", "Description of Task_3", "NEW");
+
+        fileBackedTaskManager.createTask(taskFst);
+        fileBackedTaskManager.createTask(taskSnd);
+        fileBackedTaskManager.createTask(taskThd);
+
+        FileBackedTaskManager secondManager = FileBackedTaskManager.loadFromFile(fileStorage);
+
+        boolean condition = fileBackedTaskManager.getTasksList().equals(secondManager.getTasksList());
+
+
+        Assertions.assertTrue(condition);
+
+
+    }
+
+
+    private void initializeEmptyFileStorageAndManager() throws IOException {
+        fileStorage = File.createTempFile("test_storage", ".csv");
+        fileWriter = new FileWriter(fileStorage, StandardCharsets.UTF_8, true);
+        fileWriter.write(FileBackedTaskManager.getFileDataFormat() + "\n");
+        fileWriter.close();
+        fileBackedTaskManager = FileBackedTaskManager.loadFromFile(fileStorage);
     }
 
 
