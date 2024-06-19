@@ -1,10 +1,11 @@
+import lib.InMemoryTaskManager;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import tasks.Epic;
-import tasks.Statuses;
-import tasks.SubTask;
-import tasks.Task;
+import lib.tasks.Epic;
+import lib.tasks.Statuses;
+import lib.tasks.SubTask;
+import lib.tasks.Task;
 
 import java.util.ArrayList;
 import java.util.List;

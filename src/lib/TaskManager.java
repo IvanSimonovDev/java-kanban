@@ -1,6 +1,9 @@
-import tasks.Epic;
-import tasks.SubTask;
-import tasks.Task;
+package lib;
+
+import lib.HistoryManager;
+import lib.tasks.Epic;
+import lib.tasks.SubTask;
+import lib.tasks.Task;
 
 import java.util.ArrayList;
 

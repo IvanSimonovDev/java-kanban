@@ -1,4 +1,6 @@
-import tasks.Task;
+package lib;
+
+import lib.tasks.Task;
 
 import java.util.HashMap;
 import java.util.Map;

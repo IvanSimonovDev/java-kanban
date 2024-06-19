@@ -1,6 +1,9 @@
-import tasks.Epic;
-import tasks.SubTask;
-import tasks.Task;
+import lib.HistoryManager;
+import lib.Managers;
+import lib.TaskManager;
+import lib.tasks.Epic;
+import lib.tasks.SubTask;
+import lib.tasks.Task;
 
 public class Main {
 
