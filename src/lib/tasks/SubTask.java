@@ -1,4 +1,4 @@
-package tasks;
+package lib.tasks;
 
 public class SubTask extends Task {
     public short epicId;

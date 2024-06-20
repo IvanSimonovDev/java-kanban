@@ -1,4 +1,4 @@
-package tasks;
+package lib.tasks;
 
 public enum Statuses {
     NEW,

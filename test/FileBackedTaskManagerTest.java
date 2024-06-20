@@ -1,21 +1,29 @@
-import lib.InMemoryTaskManager;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import lib.FileBackedTaskManager;
 import lib.tasks.Epic;
 import lib.tasks.Statuses;
 import lib.tasks.SubTask;
 import lib.tasks.Task;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-class InMemoryTaskManagerTest {
-    private static InMemoryTaskManager inMemoryTaskManager;
+class FileBackedTaskManagerTest {
+    private static FileBackedTaskManager fileBackedTaskManager;
+    private static File fileStorage;
+    private static FileWriter fileWriter;
 
     @BeforeEach
-    public void taskManagerCreation() {
-        inMemoryTaskManager = new InMemoryTaskManager();
+    public void taskManagerCreation()  {
+        File defaultStorage = new File(FileBackedTaskManager.getDefaultFileStorageStringPath());
+        defaultStorage.delete();
+        fileBackedTaskManager = new FileBackedTaskManager();
     }
 
     @Test
@@ -24,10 +32,10 @@ class InMemoryTaskManagerTest {
         Epic epicOfSubTask = new Epic("Epic_1", "Description of Epic_1", "NEW");
         SubTask subTask = new SubTask("SubTask_1", "Description of SubTask_1", "NEW", epicOfSubTask.id);
 
-        inMemoryTaskManager.createEpic(epicOfSubTask);
-        inMemoryTaskManager.createSubTask(subTask);
+        fileBackedTaskManager.createEpic(epicOfSubTask);
+        fileBackedTaskManager.createSubTask(subTask);
 
-        SubTask returnedSubTask = inMemoryTaskManager.getSubTask(subTask.id);
+        SubTask returnedSubTask = fileBackedTaskManager.getSubTask(subTask.id);
 
         Assertions.assertEquals(subTask, returnedSubTask);
     }
@@ -37,9 +45,9 @@ class InMemoryTaskManagerTest {
 
         Task task = new Task("Task_1", "Description of Task_1", "NEW");
 
-        inMemoryTaskManager.createTask(task);
+        fileBackedTaskManager.createTask(task);
 
-        Task returnedTask = inMemoryTaskManager.getTask(task.id);
+        Task returnedTask = fileBackedTaskManager.getTask(task.id);
 
         Assertions.assertEquals(task, returnedTask);
     }
@@ -49,9 +57,9 @@ class InMemoryTaskManagerTest {
 
         Epic epic = new Epic("Epic_1", "Description of Epic_1", "NEW");
 
-        inMemoryTaskManager.createEpic(epic);
+        fileBackedTaskManager.createEpic(epic);
 
-        Epic returnedEpic = inMemoryTaskManager.getEpic(epic.id);
+        Epic returnedEpic = fileBackedTaskManager.getEpic(epic.id);
 
         Assertions.assertEquals(epic, returnedEpic);
     }
@@ -59,15 +67,15 @@ class InMemoryTaskManagerTest {
     @Test
     public void TaskWithSetIdAndTaskWithGeneratedIdDoNotConflict() {
         Task task = new Task("Task_1", "Description of Task_1", "NEW");
-        inMemoryTaskManager.createTask(task);
+        fileBackedTaskManager.createTask(task);
 
         Task updatedTask = new Task(task.id, "Another Task_1", "Description of Task_1", "DONE");
-        inMemoryTaskManager.updateTask(updatedTask);
+        fileBackedTaskManager.updateTask(updatedTask);
 
-        List<Task> listOfTasks = inMemoryTaskManager.getTasksList();
+        List<Task> listOfTasks = fileBackedTaskManager.getTasksList();
 
         boolean condition = (listOfTasks.size() == 1) &&
-                inMemoryTaskManager.getTask(updatedTask.id).title.equals("Another Task_1");
+                fileBackedTaskManager.getTask(updatedTask.id).title.equals("Another Task_1");
 
         Assertions.assertTrue(condition);
     }
@@ -75,8 +83,8 @@ class InMemoryTaskManagerTest {
     @Test
     public void TaskDoesNotChangeAfterAddingToManager() {
         Task task = new Task("Task_1", "Description of Task_1", "NEW");
-        inMemoryTaskManager.createTask(task);
-        Task returnedTask = inMemoryTaskManager.getTask(task.id);
+        fileBackedTaskManager.createTask(task);
+        Task returnedTask = fileBackedTaskManager.getTask(task.id);
         boolean condition = (task.id == returnedTask.id) && (task.title.equals(returnedTask.title)) &&
                 (task.description.equals(returnedTask.description)) && (task.status.equals(returnedTask.status));
 
@@ -89,9 +97,9 @@ class InMemoryTaskManagerTest {
         Epic epicOfSubTask = new Epic("Epic_1", "Description of Epic_1", "NEW");
         SubTask subTask = new SubTask("SubTask_1", "Description of SubTask_1", "NEW", epicOfSubTask.id);
 
-        inMemoryTaskManager.createEpic(epicOfSubTask);
-        inMemoryTaskManager.createSubTask(subTask);
-        inMemoryTaskManager.deleteSubTask(subTask.id);
+        fileBackedTaskManager.createEpic(epicOfSubTask);
+        fileBackedTaskManager.createSubTask(subTask);
+        fileBackedTaskManager.deleteSubTask(subTask.id);
 
         Assertions.assertTrue(epicOfSubTask.subtasksIds.isEmpty());
 
@@ -178,5 +186,74 @@ class InMemoryTaskManagerTest {
 
     }
 
+    @Test
+    public void shouldGetNoTasksFromEmptyFile() throws IOException {
+
+        initializeEmptyFileStorageAndManager();
+
+
+        boolean conditionFst = fileBackedTaskManager.getTasksList().isEmpty();
+        boolean conditionSnd = fileBackedTaskManager.getSubTasksList().isEmpty();
+        boolean conditionThd = fileBackedTaskManager.getEpicsList().isEmpty();
+
+        Assertions.assertTrue(conditionFst && conditionSnd && conditionThd);
+
+
+    }
+
+    @Test
+    public void shouldBeNoTasksInFileWhenManagerIsEmpty() throws IOException {
+        initializeEmptyFileStorageAndManager();
+        long emptyFileStorageSize = fileStorage.length();
+
+        short taskId = 22;
+        Task task = new Task(taskId, "Task_1", "Description of Task_1", "NEW");
+        fileBackedTaskManager.createTask(task);
+        fileBackedTaskManager.deleteTask(taskId);
+
+        boolean conditionFst = fileBackedTaskManager.getTasksList().isEmpty();
+        boolean conditionSnd = (fileStorage.length() == emptyFileStorageSize);
+
+        Assertions.assertTrue(conditionFst && conditionSnd);
+
+
+    }
+
+    @Test
+    public void taskManagerShouldSaveAndLoadMoreThanOneTask() throws IOException {
+        initializeEmptyFileStorageAndManager();
+
+        short taskFstId = 22;
+        short taskSndId = 23;
+        short taskThdId = 24;
+
+        Task taskFst = new Task(taskFstId, "Task_1", "Description of Task_1", "NEW");
+        Task taskSnd = new Task(taskSndId, "Task_2", "Description of Task_2", "NEW");
+        Task taskThd = new Task(taskThdId, "Task_3", "Description of Task_3", "NEW");
+
+        fileBackedTaskManager.createTask(taskFst);
+        fileBackedTaskManager.createTask(taskSnd);
+        fileBackedTaskManager.createTask(taskThd);
+
+        FileBackedTaskManager secondManager = FileBackedTaskManager.loadFromFile(fileStorage);
+
+        boolean condition = fileBackedTaskManager.getTasksList().equals(secondManager.getTasksList());
+
+
+        Assertions.assertTrue(condition);
+
+
+    }
+
+
+    private void initializeEmptyFileStorageAndManager() throws IOException {
+        fileStorage = File.createTempFile("test_storage", ".csv");
+        fileWriter = new FileWriter(fileStorage, StandardCharsets.UTF_8, true);
+        fileWriter.write(FileBackedTaskManager.getFileDataFormat() + "\n");
+        fileWriter.close();
+        fileBackedTaskManager = FileBackedTaskManager.loadFromFile(fileStorage);
+    }
+
 
 }
+

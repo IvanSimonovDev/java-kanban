@@ -1,17 +1,19 @@
-import tasks.Epic;
-import tasks.Statuses;
-import tasks.SubTask;
-import tasks.Task;
+package lib;
+
+import lib.tasks.Epic;
+import lib.tasks.Statuses;
+import lib.tasks.SubTask;
+import lib.tasks.Task;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class InMemoryTaskManager implements TaskManager {
-    private final HashMap<Short, SubTask> subTaskStorage;
-    private final HashMap<Short, Task> taskStorage;
-    private final HashMap<Short, Epic> epicStorage;
+    protected final HashMap<Short, SubTask> subTaskStorage;
+    protected final HashMap<Short, Task> taskStorage;
+    protected final HashMap<Short, Epic> epicStorage;
 
-    private final HistoryManager historyManager;
+    protected final HistoryManager historyManager;
 
     public InMemoryTaskManager() {
         subTaskStorage = new HashMap<>();
@@ -155,7 +157,7 @@ public class InMemoryTaskManager implements TaskManager {
         return result;
     }
 
-    private void setEpicStatus(short epicId) {
+    protected void setEpicStatus(short epicId) {
         Epic epic = epicStorage.get(epicId);
 
         if (epic.subtasksIds.isEmpty() || areAllSubTasksInStatus("NEW", epicId)) {
@@ -168,7 +170,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     }
 
-    private boolean areAllSubTasksInStatus(String status, short epicId) {
+    protected boolean areAllSubTasksInStatus(String status, short epicId) {
         boolean result = true;
         Statuses enumStatus = Statuses.valueOf(status);
 
