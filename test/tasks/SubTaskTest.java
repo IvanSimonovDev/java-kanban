@@ -5,6 +5,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 class SubTaskTest {
 
     private String title;
@@ -69,6 +72,19 @@ class SubTaskTest {
         boolean condition = (subTask != cloneSubTask) && (subTask.getClass() == cloneSubTask.getClass());
 
         Assertions.assertTrue(condition);
+    }
+
+    @Test
+    public void possibleToSetTemporalProperties() {
+        short id = 1;
+        String stringStartTime = "2007-09-01T21:00";
+        LocalDateTime startTime = LocalDateTime.parse(stringStartTime);
+        int durationInMinutes = 60;
+        Duration duration = Duration.ofMinutes(durationInMinutes);
+
+        SubTask subTask = new SubTask(id, title, description, status, epicId, startTime, duration);
+
+        Assertions.assertTrue(subTask.startTime.equals(startTime) && subTask.duration.equals(duration));
     }
 
 }

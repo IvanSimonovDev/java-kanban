@@ -7,6 +7,8 @@ import lib.tasks.Statuses;
 import lib.tasks.SubTask;
 import lib.tasks.Task;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -175,6 +177,63 @@ class InMemoryTaskManagerTest {
         boolean conditionFth = (task.status == newTaskStatus);
 
         Assertions.assertTrue(conditionFst && conditionSnd && conditionThd && conditionFth);
+    }
+
+    @Test
+    public void epicTemporalPropertiesFormCorrectly() {
+        short epicId = 1;
+        Epic epic = new Epic(epicId, "Epic_1", "Description_1", "NEW");
+
+        //создание объекта первого эпика
+        String subtaskFstStringStartTime = "2007-09-01T21:00";
+        LocalDateTime subtaskFstStartTime = LocalDateTime.parse(subtaskFstStringStartTime);
+        int subTaskFstDurationInMinutes = 60;
+        Duration subTaskFstDuration = Duration.ofMinutes(subTaskFstDurationInMinutes);
+        SubTask subTaskFst = new SubTask(
+                (short) 2,
+                "Subtask_1",
+                "Description_2",
+                "NEW",
+                epicId,
+                subtaskFstStartTime,
+                subTaskFstDuration
+        );
+
+        //создание объекта второй подзадачи эпика (без указания времени и продолжительности)
+        SubTask subTaskSnd = new SubTask(
+                (short) 3,
+                "Subtask_2",
+                "Description_3",
+                "NEW",
+                epicId
+        );
+
+        //создание объекта третьей подзадачи эпика
+        String subtaskThdStringStartTime = "2007-09-03T12:00";
+        LocalDateTime subtaskThdStartTime = LocalDateTime.parse(subtaskThdStringStartTime);
+        int subTaskThdDurationInMinutes = 12;
+        Duration subTaskThdDuration = Duration.ofMinutes(subTaskFstDurationInMinutes);
+        SubTask subTaskThd = new SubTask(
+                (short) 4,
+                "Subtask_3",
+                "Description_4",
+                "NEW",
+                epicId,
+                subtaskThdStartTime,
+                subTaskThdDuration
+        );
+
+        inMemoryTaskManager.createEpic(epic);
+        List.of(subTaskFst, subTaskSnd, subTaskThd)
+                .stream()
+                .peek(subTask -> inMemoryTaskManager.createSubTask(subTask))
+                .toList();
+
+        boolean condition1 = epic.startTime.equals(subTaskFst.startTime);
+        boolean condition2 = epic.duration.equals(subTaskFst.duration.plus(subTaskThd.duration));
+        boolean condition3 = epic.endTime.equals(subTaskThd.getEndTime());
+
+        Assertions.assertTrue(condition1 && condition2 && condition3);
 
     }
 

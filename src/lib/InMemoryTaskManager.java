@@ -5,8 +5,11 @@ import lib.tasks.Statuses;
 import lib.tasks.SubTask;
 import lib.tasks.Task;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.time.Duration;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class InMemoryTaskManager implements TaskManager {
     protected final HashMap<Short, SubTask> subTaskStorage;
@@ -37,6 +40,7 @@ public class InMemoryTaskManager implements TaskManager {
         Epic epicOfSubTask = epicStorage.get(subTask.epicId);
         epicOfSubTask.subtasksIds.add(subTask.id);
         setEpicStatus(epicOfSubTask.id);
+        setEpicTemporalProperties(epicOfSubTask);
     }
 
     @Override
@@ -47,6 +51,7 @@ public class InMemoryTaskManager implements TaskManager {
         Epic epic = epicStorage.get(epicId);
         epic.subtasksIds.remove(id);
         setEpicStatus(epicId);
+        setEpicTemporalProperties(epic);
 
         historyManager.remove(id);
     }
@@ -55,6 +60,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void updateSubTask(SubTask subTask) {
         subTaskStorage.put(subTask.id, subTask);
         setEpicStatus(subTask.epicId);
+        setEpicTemporalProperties(getEpic(subTask.epicId));
     }
 
     @Override
@@ -68,6 +74,7 @@ public class InMemoryTaskManager implements TaskManager {
             Epic epicOfSubTask = epicStorage.get(subTask.epicId);
             epicOfSubTask.subtasksIds.clear();
             setEpicStatus(epicOfSubTask.id);
+            setEpicTemporalProperties(epicOfSubTask);
 
             historyManager.remove(subTask.id);
         }
@@ -181,6 +188,34 @@ public class InMemoryTaskManager implements TaskManager {
             result = result && (enumStatus == enumStatusOfSubTask);
         }
         return result;
+    }
+
+    // Метод устанавливает временные свойства эпика на основании временных свойств его подзадач.
+    private void setEpicTemporalProperties(Epic epic) {
+        List<SubTask> subTasksOfEpic = this.subTasksOfEpic(epic.id);
+
+        epic.duration = Duration.ofMinutes(0);
+        Predicate<SubTask> filterTemporalNulls = element -> (element.duration != null) && (element.startTime != null);
+        List<SubTask> subTasksWithoutTemporalNulls =
+                subTasksOfEpic.stream()
+                        .filter(filterTemporalNulls)
+                        .peek(element -> epic.duration = epic.duration.plus(element.duration))
+                        .collect(Collectors.toList());
+
+        if (subTasksWithoutTemporalNulls.isEmpty()) {
+            epic.duration = null;
+            epic.startTime = null;
+            epic.endTime = null;
+        } else {
+              Comparator<SubTask> comparator =
+                      (subtask1, subtask2) -> subtask1.startTime.isAfter(subtask2.startTime) ? 1 : -1;
+              SubTask earliestSubtask = Collections.min(subTasksWithoutTemporalNulls, comparator);
+              SubTask latestSubtask = Collections.max(subTasksWithoutTemporalNulls, comparator);
+              epic.startTime = earliestSubtask.startTime;
+              epic.endTime = latestSubtask.getEndTime();
+        }
+
+
     }
 
     @Override

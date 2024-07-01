@@ -7,12 +7,14 @@ import lib.tasks.Task;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class FileBackedTaskManager extends InMemoryTaskManager implements TaskManager {
 
-    private static final String FILE_DATA_FORMAT = "id,type,title,description,status,epicId";
+    private static final String FILE_DATA_FORMAT = "id,type,title,description,status,epicId,startTime,duration";
     private static final String DEFAULT_FILE_STORAGE_STRING_PATH = "resources/file_storage.csv";
     private final File storage;
 
@@ -122,8 +124,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         } catch (IOException e) {
             throw new ManagerSaveException("500. Ошибка при считывании данных из хранилища.");
         }
-
-
     }
 
     private void saveEveryTask(Writer writer) throws java.io.IOException {
@@ -134,20 +134,25 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         for (Task task : tempStorage.values()) {
             String canonicalName = task.getClass().getCanonicalName();
             String output = "";
+            String stringStartTime = (task.startTime == null) ? "null" : task.startTime.toString();
+            String stringDuration = (task.duration == null) ? "null" : String.valueOf(task.duration.toMinutes());
 
             switch (canonicalName) {
                 case "lib.tasks.Task":
                     output = String.join(",", String.valueOf(task.id), "Task",
-                            task.title, task.description, task.status.toString(), "-", "\n");
+                            task.title, task.description, task.status.toString(), "-",
+                            stringStartTime, stringDuration, "\n");
                     break;
                 case "lib.tasks.Epic":
                     output = String.join(",", String.valueOf(task.id), "Epic",
-                            task.title, task.description, task.status.toString(), "-", "\n");
+                            task.title, task.description, task.status.toString(), "-",
+                            "-", "-", "\n");
                     break;
                 case "lib.tasks.SubTask":
                     SubTask subTask = (SubTask) task;
                     output = String.join(",", String.valueOf(subTask.id), "SubTask", subTask.title,
-                            subTask.description, subTask.status.toString(), String.valueOf(subTask.epicId), "\n");
+                            subTask.description, subTask.status.toString(), String.valueOf(subTask.epicId),
+                            stringStartTime, stringDuration, "\n");
                     break;
             }
 
@@ -158,7 +163,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     }
 
     public void loadData() {
-
         try {
 
             if (!storage.exists()) {
@@ -198,6 +202,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         int descriptionPosition = 3;
         int statusPosition = 4;
         int epicIdPosition = 5;
+        int startTimePosition = 6;
+        int durationPosition = 7;
 
         String[] lineParts = line.split(",");
 
@@ -206,14 +212,28 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         String description = lineParts[descriptionPosition];
         String status = lineParts[statusPosition];
 
+        LocalDateTime startTime;
+        if (!lineParts[startTimePosition].equals("null")) {
+            startTime = LocalDateTime.parse(lineParts[startTimePosition]);
+        } else {
+            startTime = null;
+        }
+
+        Duration duration;
+        if (!lineParts[durationPosition].equals("null")) {
+            duration = Duration.ofMinutes(Integer.parseInt(lineParts[durationPosition]));
+        } else {
+            duration = null;
+        }
+
         switch (lineParts[typePosition]) {
             case "SubTask":
                 short epicId = Short.parseShort(lineParts[epicIdPosition]);
-                SubTask subtask = new SubTask(id, title, description, status, epicId);
+                SubTask subtask = new SubTask(id, title, description, status, epicId, startTime, duration);
                 createSubTask(subtask);
                 break;
             case "Task":
-                Task task = new Task(id, title, description, status);
+                Task task = new Task(id, title, description, status, startTime, duration);
                 createTask(task);
                 break;
             case "Epic":

@@ -122,5 +122,4 @@ class InMemoryHistoryManagerTest {
 
         return List.of(task, subTask, epic);
     }
-
 }

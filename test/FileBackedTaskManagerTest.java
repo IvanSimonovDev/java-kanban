@@ -11,6 +11,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -243,6 +245,38 @@ class FileBackedTaskManagerTest {
         Assertions.assertTrue(condition);
 
 
+    }
+
+    @Test
+    public void temporalFieldsShouldSaveToFileAndLoadFromFile() throws IOException {
+        initializeEmptyFileStorageAndManager();
+        Task taskFst = new Task((short) 1, "Task_1", "Description of Task_1", "NEW",
+                LocalDateTime.parse("2024-11-11T13:00"), Duration.ofMinutes(33));
+        Task taskSnd = new Task((short) 2, "Task_2", "Description of Task_2", "NEW",
+                LocalDateTime.parse("2024-11-11T14:00"), Duration.ofMinutes(43));
+        Task taskThd = new Task((short) 3, "Task_3", "Description of Task_3", "NEW",
+                LocalDateTime.parse("2024-11-11T15:00"), Duration.ofMinutes(53));
+
+        List.of(taskFst, taskSnd, taskThd)
+                .stream()
+                .peek(task -> fileBackedTaskManager.createTask(task))
+                .toList();
+        List<Task> firstManagerTasks = fileBackedTaskManager.getTasksList();
+        FileBackedTaskManager secondManager = FileBackedTaskManager.loadFromFile(fileStorage);
+
+        boolean condition1 = firstManagerTasks
+                .stream()
+                .filter(task -> !task.duration.equals(secondManager.getTask(task.id).duration))
+                .toList()
+                .isEmpty();
+
+        boolean condition2 = firstManagerTasks
+                .stream()
+                .filter(task -> !task.startTime.equals(secondManager.getTask(task.id).startTime))
+                .toList()
+                .isEmpty();
+
+        Assertions.assertTrue(condition1 && condition2);
     }
 
 

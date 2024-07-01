@@ -1,28 +1,34 @@
 package tasks;
 
 import lib.tasks.Epic;
+import lib.tasks.Task;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 class EpicTest {
-    private String title;
-    private String description;
-    private String status;
+    private String epicTitle;
+    private String epicDescription;
+    private String epicStatus;
 
     @BeforeEach
     public void settingParametersForEpic() {
-        title = "Epic_1";
-        description = "Description_1";
-        status = "NEW";
+        epicTitle = "Epic_1";
+        epicDescription = "Description_1";
+        epicStatus = "NEW";
     }
 
     @Test
     public void constructorWithoutIdShouldWork() {
-        Epic epic = new Epic(title, description, status);
+        Epic epic = new Epic(epicTitle, epicDescription, epicStatus);
 
-        boolean condition = (epic.id > 0) && (epic.title.equals(title)) && (epic.description.equals(description)) &&
-                (epic.status.toString().equals(status)) && (epic.subtasksIds.isEmpty());
+        boolean condition = (epic.id > 0) && (epic.title.equals(epicTitle)) &&
+                (epic.description.equals(epicDescription)) &&
+                (epic.status.toString().equals(epicStatus)) &&
+                (epic.subtasksIds.isEmpty());
 
         Assertions.assertTrue(condition);
     }
@@ -30,10 +36,12 @@ class EpicTest {
     @Test
     public void constructorWithIdShouldWork() {
         short id = 100;
-        Epic epic = new Epic(id, title, description, status);
+        Epic epic = new Epic(id, epicTitle, epicDescription, epicStatus);
 
-        boolean condition = (epic.id == id) && (epic.title.equals(title)) && (epic.description.equals(description)) &&
-                (epic.status.toString().equals(status)) && (epic.subtasksIds.isEmpty());
+        boolean condition = (epic.id == id) && (epic.title.equals(epicTitle)) &&
+                (epic.description.equals(epicDescription)) &&
+                (epic.status.toString().equals(epicStatus)) &&
+                (epic.subtasksIds.isEmpty());
 
         Assertions.assertTrue(condition);
     }
@@ -49,19 +57,18 @@ class EpicTest {
     @Test
     public void hashCodeShouldBeEqualToId() {
         short id = 100;
-        Epic epic = new Epic(id, title, description, status);
+        Epic epic = new Epic(id, epicTitle, epicDescription, epicStatus);
 
         Assertions.assertEquals(epic.id, epic.hashCode());
     }
 
     @Test
     public void methodCloneShouldReturnNotSameObjectWithSameClass() {
-        Epic epic = new Epic(title, description, status);
+        Epic epic = new Epic(epicTitle, epicDescription, epicStatus);
         Epic cloneEpic = epic.clone();
 
         boolean condition = (epic != cloneEpic) && (epic.getClass() == cloneEpic.getClass());
 
         Assertions.assertTrue(condition);
     }
-
 }

@@ -1,5 +1,7 @@
 package lib.tasks;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -11,9 +13,16 @@ public class Task {
     public String title;
     public String description;
     public Statuses status;
+    public LocalDateTime startTime;
+    public Duration duration;
 
 
-    public Task(String title, String description, String status) {
+
+    public Task(
+            String title,
+            String description,
+            String status
+    ) {
         this.multipleSetter(title, description, status);
 
         short id = (short) RANDOM_GENERATOR.nextInt(Short.MAX_VALUE);
@@ -24,9 +33,38 @@ public class Task {
         Task.ID_LIST.add(id);
     }
 
-    public Task(short id, String title, String description, String status) {
+    public Task(
+            short id,
+            String title,
+            String description,
+            String status
+    ) {
         this.multipleSetter(title, description, status);
 
+        this.id = id;
+    }
+    public Task(
+            String title,
+            String description,
+            String status,
+            LocalDateTime startTime,
+            Duration duration
+    ) {
+        this(title, description, status);
+        this.startTime = startTime;
+        this.duration = duration;
+
+    }
+
+    public Task(
+            short id,
+            String title,
+            String description,
+            String status,
+            LocalDateTime startTime,
+            Duration duration
+    ) {
+        this(title, description, status, startTime, duration);
         this.id = id;
     }
 
@@ -36,10 +74,14 @@ public class Task {
         this.status = Statuses.valueOf(status);
     }
 
+    public LocalDateTime getEndTime() {
+        return startTime.plus(duration);
+    }
+
 
     @Override
     public String toString() {
-        String klass = this.getClass().toString().split("\\.")[1];
+        String klass = this.getClass().toString().split("\\.")[2];
         return title + " ( " + klass + ", id = " + id + " )";
     }
 
@@ -62,6 +104,13 @@ public class Task {
 
     @Override
     public Task clone() {
-        return new Task(this.id, this.title, this.description, this.status.toString());
+         return new Task(
+                 this.id,
+                 this.title,
+                 this.description,
+                 this.status.toString(),
+                 this.startTime,
+                 this.duration
+        );
     }
 }
