@@ -1,13 +1,9 @@
 package tasks;
 
 import lib.tasks.Epic;
-import lib.tasks.Task;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.time.Duration;
-import java.time.LocalDateTime;
 
 class EpicTest {
     private String epicTitle;

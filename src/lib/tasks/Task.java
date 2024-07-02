@@ -17,7 +17,6 @@ public class Task {
     public Duration duration;
 
 
-
     public Task(
             String title,
             String description,
@@ -43,6 +42,7 @@ public class Task {
 
         this.id = id;
     }
+
     public Task(
             String title,
             String description,
@@ -84,7 +84,7 @@ public class Task {
             boolean condition2 = this.getEndTime().isBefore(task.startTime);
             return !(condition1 || condition2);
         } else {
-              return false;
+            return false;
         }
     }
 
@@ -118,13 +118,13 @@ public class Task {
 
     @Override
     public Task clone() {
-         return new Task(
-                 this.id,
-                 this.title,
-                 this.description,
-                 this.status.toString(),
-                 this.startTime,
-                 this.duration
+        return new Task(
+                this.id,
+                this.title,
+                this.description,
+                this.status.toString(),
+                this.startTime,
+                this.duration
         );
     }
 }

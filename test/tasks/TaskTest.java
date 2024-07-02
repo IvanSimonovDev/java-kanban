@@ -83,4 +83,21 @@ class TaskTest {
 
         Assertions.assertTrue(task.startTime.equals(startTime) && task.duration.equals(duration));
     }
+
+    @Test
+    public void collisionDetectsCorrectly() {
+        Duration duration1 = Duration.ofHours(2);
+        Duration duration2 = Duration.ofHours(4);
+        Duration duration3 = Duration.ofHours(8);
+        LocalDateTime startTime1 = LocalDateTime.of(2024, 1, 1, 12, 0);
+        LocalDateTime startTime2 = startTime1.plus(duration1);
+        LocalDateTime startTime3 = startTime1.plus(duration3);
+
+        Task task1 = new Task("Task1", "Description1", "NEW", startTime1, duration2);
+        Task task2 = new Task("Task2", "Description2", "NEW", startTime2, duration2);
+        Task task3 = new Task("Task3", "Description3", "NEW", startTime3, duration2);
+
+        boolean condition = task1.isTimeCollision(task2) && !task1.isTimeCollision(task3);
+        Assertions.assertTrue(condition);
+    }
 }

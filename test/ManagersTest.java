@@ -1,9 +1,9 @@
 import lib.InMemoryHistoryManager;
 import lib.InMemoryTaskManager;
 import lib.Managers;
+import lib.tasks.Task;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import lib.tasks.Task;
 
 
 class ManagersTest {

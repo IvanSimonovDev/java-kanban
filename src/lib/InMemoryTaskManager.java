@@ -167,6 +167,12 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateEpic(Epic updatedEpic) {
+        Epic oldEpic = getEpic(updatedEpic.id);
+        updatedEpic.subtasksIds = oldEpic.subtasksIds;
+        updatedEpic.startTime = oldEpic.startTime;
+        updatedEpic.duration = oldEpic.duration;
+        updatedEpic.endTime = oldEpic.endTime;
+
         epicStorage.put(updatedEpic.id, updatedEpic);
     }
 
@@ -197,7 +203,7 @@ public class InMemoryTaskManager implements TaskManager {
         Statuses enumStatus = Statuses.valueOf(status);
 
         Epic epic = epicStorage.get(epicId);
-        Predicate<Short> subTaskInStatus =  subTaskId -> {
+        Predicate<Short> subTaskInStatus = subTaskId -> {
             SubTask subtask = subTaskStorage.get(subTaskId);
             return enumStatus == subtask.status;
         };

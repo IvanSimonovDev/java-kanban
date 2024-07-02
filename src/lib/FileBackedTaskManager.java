@@ -1,6 +1,6 @@
 package lib;
 
-import lib.exceptions.ManagerSaveException;
+import lib.exceptions.ManagerSaveLoadException;
 import lib.tasks.Epic;
 import lib.tasks.SubTask;
 import lib.tasks.Task;
@@ -122,7 +122,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
             saveEveryTask(bufferedWriter);
 
         } catch (IOException e) {
-            throw new ManagerSaveException("500. Ошибка при сохранении данных в хранилище.");
+            throw new ManagerSaveLoadException("500. Ошибка при сохранении данных в хранилище.");
         }
     }
 
@@ -146,7 +146,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
                 case "lib.tasks.Epic":
                     output = String.join(",", String.valueOf(task.id), "Epic",
                             task.title, task.description, task.status.toString(), "-",
-                            "-", "-", "\n");
+                            "null", "null", "\n");
                     break;
                 case "lib.tasks.SubTask":
                     SubTask subTask = (SubTask) task;
@@ -175,12 +175,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
             }
 
         } catch (IOException e) {
-            int errorCode = 2;
-            System.out.println("500. Ошибка при получении данных из хранилища или его создании.");
-            System.exit(errorCode);
+            throw new ManagerSaveLoadException("500. Ошибка при получении данных из хранилища или его создании.");
         }
-
-
     }
 
     private void loadDataFromFile() throws IOException {

@@ -39,7 +39,5 @@ public class Main {
         boolean conditionThd = fstTaskManager.getEpicsList().equals(sndTaskManager.getEpicsList());
 
         System.out.println(conditionFst && conditionSnd && conditionThd); // true
-
-
     }
 }
