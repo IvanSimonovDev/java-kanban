@@ -122,7 +122,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
             saveEveryTask(bufferedWriter);
 
         } catch (IOException e) {
-            throw new ManagerSaveException("500. Ошибка при считывании данных из хранилища.");
+            throw new ManagerSaveException("500. Ошибка при сохранении данных в хранилище.");
         }
     }
 

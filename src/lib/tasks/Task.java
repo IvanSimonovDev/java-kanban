@@ -78,6 +78,20 @@ public class Task {
         return startTime.plus(duration);
     }
 
+    public boolean isTimeCollision(Task task) {
+        if (this.areStartTimeAndDurationNotNull() && task.areStartTimeAndDurationNotNull()) {
+            boolean condition1 = this.startTime.isAfter(task.getEndTime());
+            boolean condition2 = this.getEndTime().isBefore(task.startTime);
+            return !(condition1 || condition2);
+        } else {
+              return false;
+        }
+    }
+
+    private boolean areStartTimeAndDurationNotNull() {
+        return (this.startTime != null && this.duration != null);
+    }
+
 
     @Override
     public String toString() {
