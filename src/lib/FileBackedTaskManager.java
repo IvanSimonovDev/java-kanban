@@ -132,23 +132,22 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         tempStorage.putAll(subTaskStorage);
 
         for (Task task : tempStorage.values()) {
-            String canonicalName = task.getClass().getCanonicalName();
             String output = "";
             String stringStartTime = (task.startTime == null) ? "null" : task.startTime.toString();
             String stringDuration = (task.duration == null) ? "null" : String.valueOf(task.duration.toMinutes());
 
-            switch (canonicalName) {
-                case "lib.tasks.Task":
+            switch (task.taskType) {
+                case TASK:
                     output = String.join(",", String.valueOf(task.id), "Task",
                             task.title, task.description, task.status.toString(), "-",
                             stringStartTime, stringDuration, "\n");
                     break;
-                case "lib.tasks.Epic":
+                case EPIC:
                     output = String.join(",", String.valueOf(task.id), "Epic",
                             task.title, task.description, task.status.toString(), "-",
                             "null", "null", "\n");
                     break;
-                case "lib.tasks.SubTask":
+                case SUBTASK:
                     SubTask subTask = (SubTask) task;
                     output = String.join(",", String.valueOf(subTask.id), "SubTask", subTask.title,
                             subTask.description, subTask.status.toString(), String.valueOf(subTask.epicId),

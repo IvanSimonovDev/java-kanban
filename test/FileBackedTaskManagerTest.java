@@ -97,8 +97,7 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
 
         List.of(taskFst, taskSnd, taskThd)
                 .stream()
-                .peek(task -> taskManager.createTask(task))
-                .toList();
+                .forEach(task -> taskManager.createTask(task));
         List<Task> firstManagerTasks = taskManager.getTasksList();
         FileBackedTaskManager secondManager = FileBackedTaskManager.loadFromFile(fileStorage);
 

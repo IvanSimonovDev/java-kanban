@@ -13,7 +13,7 @@ public class SubTask extends Task {
             short epicId
     ) {
         super(title, description, status);
-        this.epicId = epicId;
+        setEpicIdAndTaskType(epicId);
     }
 
     public SubTask(short id,
@@ -23,7 +23,7 @@ public class SubTask extends Task {
                    short epicId
     ) {
         super(id, title, description, status);
-        this.epicId = epicId;
+        setEpicIdAndTaskType(epicId);
     }
 
     public SubTask(
@@ -35,7 +35,7 @@ public class SubTask extends Task {
             Duration duration
     ) {
         super(title, description, status, startTime, duration);
-        this.epicId = epicId;
+        setEpicIdAndTaskType(epicId);
 
     }
 
@@ -49,7 +49,12 @@ public class SubTask extends Task {
             Duration duration
     ) {
         super(id, title, description, status, startTime, duration);
+        setEpicIdAndTaskType(epicId);
+    }
+
+    private void setEpicIdAndTaskType(short epicId) {
         this.epicId = epicId;
+        this.taskType = TaskType.SUBTASK;
     }
 
     @Override

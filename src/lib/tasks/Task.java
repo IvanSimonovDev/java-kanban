@@ -15,14 +15,14 @@ public class Task {
     public Statuses status;
     public LocalDateTime startTime;
     public Duration duration;
-
+    public TaskType taskType;
 
     public Task(
             String title,
             String description,
             String status
     ) {
-        this.multipleSetter(title, description, status);
+        setTaskTypeAndCallMultipleSetter(title, description, status);
 
         short id = (short) RANDOM_GENERATOR.nextInt(Short.MAX_VALUE);
         while (ID_LIST.contains(id)) {
@@ -38,7 +38,7 @@ public class Task {
             String description,
             String status
     ) {
-        this.multipleSetter(title, description, status);
+        setTaskTypeAndCallMultipleSetter(title, description, status);
 
         this.id = id;
     }
@@ -66,6 +66,11 @@ public class Task {
     ) {
         this(title, description, status, startTime, duration);
         this.id = id;
+    }
+
+    private void setTaskTypeAndCallMultipleSetter(String title, String description, String status) {
+        taskType = TaskType.TASK;
+        multipleSetter(title, description, status);
     }
 
     private void multipleSetter(String title, String description, String status) {

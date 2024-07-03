@@ -89,7 +89,7 @@ public class InMemoryTaskManager implements TaskManager {
             historyManager.remove(subTask.id);
             prioritizedTasks.remove(subTask);
         };
-        subTaskStorage.values().stream().peek(cleanFunction).toList();
+        subTaskStorage.values().stream().forEach(cleanFunction);
         subTaskStorage.clear();
     }
 
@@ -134,7 +134,7 @@ public class InMemoryTaskManager implements TaskManager {
             prioritizedTasks.remove(getTask(taskId));
             historyManager.remove(taskId);
         };
-        taskStorage.keySet().stream().peek(cleanFunction).toList();
+        taskStorage.keySet().stream().forEach(cleanFunction);
 
         taskStorage.clear();
     }
@@ -162,7 +162,7 @@ public class InMemoryTaskManager implements TaskManager {
             subTaskStorage.remove(subTaskId);
             historyManager.remove(subTaskId);
         };
-        epic.subtasksIds.stream().peek(deleteSubtask).toList();
+        epic.subtasksIds.stream().forEach(deleteSubtask);
     }
 
     @Override
@@ -182,7 +182,7 @@ public class InMemoryTaskManager implements TaskManager {
         ArrayList<SubTask> result = new ArrayList<>(initialCapacity);
         Epic epic = epicStorage.get(epicId);
         Consumer<Short> addSubTaskToResult = subTaskId -> result.add(subTaskStorage.get(subTaskId));
-        epic.subtasksIds.stream().peek(addSubTaskToResult).toList();
+        epic.subtasksIds.stream().forEach(addSubTaskToResult);
         return result;
     }
 
@@ -246,7 +246,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteAllEpics() {
         deleteAllSubTasks();
-        epicStorage.keySet().stream().peek(historyManager::remove).toList();
+        epicStorage.keySet().stream().forEach(historyManager::remove);
         epicStorage.clear();
     }
 

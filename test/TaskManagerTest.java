@@ -313,8 +313,7 @@ abstract class TaskManagerTest<T extends InMemoryTaskManager> {
         taskManager.createEpic(epic);
         List.of(subTaskFst, subTaskSnd, subTaskThd)
                 .stream()
-                .peek(subTask -> taskManager.createSubTask(subTask))
-                .toList();
+                .forEach(subTask -> taskManager.createSubTask(subTask));
 
         boolean condition1 = epic.startTime.equals(subTaskFst.startTime);
         boolean condition2 = epic.duration.equals(subTaskFst.duration.plus(subTaskThd.duration));

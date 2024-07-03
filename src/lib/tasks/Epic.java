@@ -9,17 +9,18 @@ public class Epic extends Task {
 
     public Epic(String title, String description, String status) {
         super(title, description, status);
-        this.createSubTasksStorage();
+        this.createSubTasksStorageAndSetTaskType();
     }
 
     public Epic(short id, String title, String description, String status) {
         super(id, title, description, status);
-        this.createSubTasksStorage();
+        this.createSubTasksStorageAndSetTaskType();
     }
 
-    private void createSubTasksStorage() {
+    private void createSubTasksStorageAndSetTaskType() {
         int initialCapacity = 7;
         this.subtasksIds = new ArrayList<>(initialCapacity);
+        this.taskType = TaskType.EPIC;
     }
 
     @Override
