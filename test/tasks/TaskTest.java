@@ -5,6 +5,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 class TaskTest {
     private String title;
     private String description;
@@ -65,6 +68,36 @@ class TaskTest {
 
         boolean condition = (task != cloneTask) && (task.getClass() == cloneTask.getClass());
 
+        Assertions.assertTrue(condition);
+    }
+
+    @Test
+    public void possibleToSetTemporalProperties() {
+        short id = 1;
+        String stringStartTime = "2007-09-01T21:00";
+        LocalDateTime startTime = LocalDateTime.parse(stringStartTime);
+        int durationInMinutes = 60;
+        Duration duration = Duration.ofMinutes(durationInMinutes);
+
+        Task task = new Task(id, title, description, status, startTime, duration);
+
+        Assertions.assertTrue(task.startTime.equals(startTime) && task.duration.equals(duration));
+    }
+
+    @Test
+    public void collisionDetectsCorrectly() {
+        Duration duration1 = Duration.ofHours(2);
+        Duration duration2 = Duration.ofHours(4);
+        Duration duration3 = Duration.ofHours(8);
+        LocalDateTime startTime1 = LocalDateTime.of(2024, 1, 1, 12, 0);
+        LocalDateTime startTime2 = startTime1.plus(duration1);
+        LocalDateTime startTime3 = startTime1.plus(duration3);
+
+        Task task1 = new Task("Task1", "Description1", "NEW", startTime1, duration2);
+        Task task2 = new Task("Task2", "Description2", "NEW", startTime2, duration2);
+        Task task3 = new Task("Task3", "Description3", "NEW", startTime3, duration2);
+
+        boolean condition = task1.isTimeCollision(task2) && !task1.isTimeCollision(task3);
         Assertions.assertTrue(condition);
     }
 }

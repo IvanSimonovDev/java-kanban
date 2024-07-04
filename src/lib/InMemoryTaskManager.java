@@ -1,12 +1,12 @@
 package lib;
 
-import lib.tasks.Epic;
-import lib.tasks.Statuses;
-import lib.tasks.SubTask;
-import lib.tasks.Task;
+import lib.tasks.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.time.Duration;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class InMemoryTaskManager implements TaskManager {
     protected final HashMap<Short, SubTask> subTaskStorage;
@@ -15,11 +15,14 @@ public class InMemoryTaskManager implements TaskManager {
 
     protected final HistoryManager historyManager;
 
+    protected final Set<Task> prioritizedTasks;
+
     public InMemoryTaskManager() {
         subTaskStorage = new HashMap<>();
         taskStorage = new HashMap<>();
         epicStorage = new HashMap<>();
         historyManager = new InMemoryHistoryManager();
+        prioritizedTasks = new TreeSet<>(new StartDateComparator());
     }
 
     //methods for SubTask
@@ -33,28 +36,41 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void createSubTask(SubTask subTask) {
+        validate(subTask);
         subTaskStorage.put(subTask.id, subTask);
+        addToPrioritizedTasksIfStartTimeNotNull(subTask);
+
         Epic epicOfSubTask = epicStorage.get(subTask.epicId);
         epicOfSubTask.subtasksIds.add(subTask.id);
         setEpicStatus(epicOfSubTask.id);
+        setEpicTemporalProperties(epicOfSubTask);
+
     }
 
     @Override
     public void deleteSubTask(Short id) {
         SubTask subTask = subTaskStorage.get(id);
         subTaskStorage.remove(id);
+
         short epicId = subTask.epicId;
         Epic epic = epicStorage.get(epicId);
         epic.subtasksIds.remove(id);
         setEpicStatus(epicId);
+        setEpicTemporalProperties(epic);
 
         historyManager.remove(id);
+        prioritizedTasks.remove(subTask);
     }
 
     @Override
     public void updateSubTask(SubTask subTask) {
+        validate(subTask);
         subTaskStorage.put(subTask.id, subTask);
+        prioritizedTasks.remove(subTask);
+        addToPrioritizedTasksIfStartTimeNotNull(subTask);
+
         setEpicStatus(subTask.epicId);
+        setEpicTemporalProperties(getEpic(subTask.epicId));
     }
 
     @Override
@@ -64,13 +80,16 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteAllSubTasks() {
-        for (SubTask subTask : subTaskStorage.values()) {
+        Consumer<SubTask> cleanFunction = subTask -> {
             Epic epicOfSubTask = epicStorage.get(subTask.epicId);
             epicOfSubTask.subtasksIds.clear();
             setEpicStatus(epicOfSubTask.id);
+            setEpicTemporalProperties(epicOfSubTask);
 
             historyManager.remove(subTask.id);
-        }
+            prioritizedTasks.remove(subTask);
+        };
+        subTaskStorage.values().stream().forEach(cleanFunction);
         subTaskStorage.clear();
     }
 
@@ -85,19 +104,21 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void createTask(Task task) {
+        validate(task);
         taskStorage.put(task.id, task);
+        addToPrioritizedTasksIfStartTimeNotNull(task);
     }
 
     @Override
     public void deleteTask(short id) {
-
+        prioritizedTasks.remove(getTask(id));
         taskStorage.remove(id);
-
         historyManager.remove(id);
     }
 
     @Override
     public void updateTask(Task updatedTask) {
+        validate(updatedTask);
         deleteTask(updatedTask.id);
         createTask(updatedTask);
     }
@@ -109,15 +130,16 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteAllTasks() {
-        for (Short taskId : taskStorage.keySet()) {
+        Consumer<Short> cleanFunction = taskId -> {
+            prioritizedTasks.remove(getTask(taskId));
             historyManager.remove(taskId);
-        }
+        };
+        taskStorage.keySet().stream().forEach(cleanFunction);
 
         taskStorage.clear();
     }
 
     //methods for Epic
-
     @Override
     public Epic getEpic(short id) {
         Epic epic = epicStorage.get(id);
@@ -135,14 +157,22 @@ public class InMemoryTaskManager implements TaskManager {
         Epic epic = epicStorage.remove(id);
         historyManager.remove(id);
 
-        for (short subTaskId : epic.subtasksIds) {
+        Consumer<Short> deleteSubtask = subTaskId -> {
+            prioritizedTasks.remove(getSubTask(subTaskId));
             subTaskStorage.remove(subTaskId);
             historyManager.remove(subTaskId);
-        }
+        };
+        epic.subtasksIds.stream().forEach(deleteSubtask);
     }
 
     @Override
     public void updateEpic(Epic updatedEpic) {
+        Epic oldEpic = getEpic(updatedEpic.id);
+        updatedEpic.subtasksIds = oldEpic.subtasksIds;
+        updatedEpic.startTime = oldEpic.startTime;
+        updatedEpic.duration = oldEpic.duration;
+        updatedEpic.endTime = oldEpic.endTime;
+
         epicStorage.put(updatedEpic.id, updatedEpic);
     }
 
@@ -151,9 +181,8 @@ public class InMemoryTaskManager implements TaskManager {
         int initialCapacity = 5;
         ArrayList<SubTask> result = new ArrayList<>(initialCapacity);
         Epic epic = epicStorage.get(epicId);
-        for (Short subTaskId : epic.subtasksIds) {
-            result.add(subTaskStorage.get(subTaskId));
-        }
+        Consumer<Short> addSubTaskToResult = subTaskId -> result.add(subTaskStorage.get(subTaskId));
+        epic.subtasksIds.stream().forEach(addSubTaskToResult);
         return result;
     }
 
@@ -171,16 +200,42 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     protected boolean areAllSubTasksInStatus(String status, short epicId) {
-        boolean result = true;
         Statuses enumStatus = Statuses.valueOf(status);
 
         Epic epic = epicStorage.get(epicId);
-        for (Short subTaskId : epic.subtasksIds) {
+        Predicate<Short> subTaskInStatus = subTaskId -> {
             SubTask subtask = subTaskStorage.get(subTaskId);
-            Statuses enumStatusOfSubTask = subtask.status;
-            result = result && (enumStatus == enumStatusOfSubTask);
+            return enumStatus == subtask.status;
+        };
+        return epic.subtasksIds.stream().allMatch(subTaskInStatus);
+    }
+
+    // Метод устанавливает временные свойства эпика на основании временных свойств его подзадач.
+    private void setEpicTemporalProperties(Epic epic) {
+        List<SubTask> subTasksOfEpic = this.subTasksOfEpic(epic.id);
+
+        epic.duration = Duration.ofMinutes(0);
+        Predicate<SubTask> filterTemporalNulls = element -> (element.duration != null) && (element.startTime != null);
+        List<SubTask> subTasksWithoutTemporalNulls =
+                subTasksOfEpic.stream()
+                        .filter(filterTemporalNulls)
+                        .peek(element -> epic.duration = epic.duration.plus(element.duration))
+                        .collect(Collectors.toList());
+
+        if (subTasksWithoutTemporalNulls.isEmpty()) {
+            epic.duration = null;
+            epic.startTime = null;
+            epic.endTime = null;
+        } else {
+            Comparator<SubTask> comparator =
+                    (subtask1, subtask2) -> subtask1.startTime.isAfter(subtask2.startTime) ? 1 : -1;
+            SubTask earliestSubtask = Collections.min(subTasksWithoutTemporalNulls, comparator);
+            SubTask latestSubtask = Collections.max(subTasksWithoutTemporalNulls, comparator);
+            epic.startTime = earliestSubtask.startTime;
+            epic.endTime = latestSubtask.getEndTime();
         }
-        return result;
+
+
     }
 
     @Override
@@ -191,15 +246,33 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteAllEpics() {
         deleteAllSubTasks();
-        for (Short epicId : epicStorage.keySet()) {
-            historyManager.remove(epicId);
-        }
+        epicStorage.keySet().stream().forEach(historyManager::remove);
         epicStorage.clear();
     }
 
     @Override
     public HistoryManager getHistoryManager() {
         return this.historyManager;
+    }
+
+    public Set<Task> getPrioritizedTasks() {
+        return prioritizedTasks;
+    }
+
+    private void addToPrioritizedTasksIfStartTimeNotNull(Task task) {
+        if (task.startTime != null) {
+            prioritizedTasks.add(task);
+        }
+    }
+
+    private void validate(Task inputTask) {
+        boolean collisionIsPresent = prioritizedTasks.stream().anyMatch(task -> task.isTimeCollision(inputTask));
+
+        if (collisionIsPresent) {
+            throw new IllegalArgumentException(
+                    "Task or subTask can not be created because of collision at least with one task/subtask"
+            );
+        }
     }
 
 }
