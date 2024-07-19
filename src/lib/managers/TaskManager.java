@@ -1,4 +1,4 @@
-package lib;
+package lib.managers;
 
 import lib.tasks.Epic;
 import lib.tasks.SubTask;

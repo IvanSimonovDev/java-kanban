@@ -1,5 +1,7 @@
-package lib;
+package lib.managers;
 
+import lib.exceptions.CollisionException;
+import lib.exceptions.NotFoundException;
 import lib.tasks.*;
 
 import java.time.Duration;
@@ -28,15 +30,19 @@ public class InMemoryTaskManager implements TaskManager {
     //methods for SubTask
 
     @Override
-    public SubTask getSubTask(short id) {
+    public SubTask getSubTask(short id) throws NotFoundException {
         SubTask subTask = subTaskStorage.get(id);
-        historyManager.add(subTask);
-        return subTask;
+        if (subTask != null) {
+            historyManager.add(subTask);
+            return subTask;
+        } else {
+            throw new NotFoundException("Requested subtask not found.");
+        }
     }
 
     @Override
-    public void createSubTask(SubTask subTask) {
-        validate(subTask);
+    public void createSubTask(SubTask subTask) throws CollisionException {
+        validateNoCollision(subTask);
         subTaskStorage.put(subTask.id, subTask);
         addToPrioritizedTasksIfStartTimeNotNull(subTask);
 
@@ -63,8 +69,8 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void updateSubTask(SubTask subTask) {
-        validate(subTask);
+    public void updateSubTask(SubTask subTask) throws CollisionException {
+        validateNoCollision(subTask);
         subTaskStorage.put(subTask.id, subTask);
         prioritizedTasks.remove(subTask);
         addToPrioritizedTasksIfStartTimeNotNull(subTask);
@@ -96,15 +102,19 @@ public class InMemoryTaskManager implements TaskManager {
     //methods for Task
 
     @Override
-    public Task getTask(short id) {
+    public Task getTask(short id) throws NotFoundException {
         Task task = taskStorage.get(id);
-        historyManager.add(task);
-        return task;
+        if (task != null) {
+            historyManager.add(task);
+            return task;
+        } else {
+            throw new NotFoundException("Requested task not found.");
+        }
     }
 
     @Override
-    public void createTask(Task task) {
-        validate(task);
+    public void createTask(Task task) throws CollisionException {
+        validateNoCollision(task);
         taskStorage.put(task.id, task);
         addToPrioritizedTasksIfStartTimeNotNull(task);
     }
@@ -117,8 +127,8 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void updateTask(Task updatedTask) {
-        validate(updatedTask);
+    public void updateTask(Task updatedTask) throws CollisionException {
+        validateNoCollision(updatedTask);
         deleteTask(updatedTask.id);
         createTask(updatedTask);
     }
@@ -141,10 +151,14 @@ public class InMemoryTaskManager implements TaskManager {
 
     //methods for Epic
     @Override
-    public Epic getEpic(short id) {
+    public Epic getEpic(short id) throws NotFoundException {
         Epic epic = epicStorage.get(id);
-        historyManager.add(epic);
-        return epic;
+        if (epic != null) {
+            historyManager.add(epic);
+            return epic;
+        } else {
+            throw new NotFoundException("Requested epic not found.");
+        }
     }
 
     @Override
@@ -265,11 +279,13 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    private void validate(Task inputTask) {
-        boolean collisionIsPresent = prioritizedTasks.stream().anyMatch(task -> task.isTimeCollision(inputTask));
+    private void validateNoCollision(Task inputTask) throws CollisionException {
+
+        boolean collisionIsPresent = prioritizedTasks.stream().anyMatch(
+                task -> (task.isTimeCollision(inputTask) && task.id != inputTask.id));
 
         if (collisionIsPresent) {
-            throw new IllegalArgumentException(
+            throw new CollisionException(
                     "Task or subTask can not be created because of collision at least with one task/subtask"
             );
         }

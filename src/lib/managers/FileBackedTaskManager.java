@@ -1,4 +1,4 @@
-package lib;
+package lib.managers;
 
 import lib.exceptions.ManagerSaveLoadException;
 import lib.tasks.Epic;

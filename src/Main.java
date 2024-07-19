@@ -1,8 +1,15 @@
-import lib.FileBackedTaskManager;
-import lib.TaskManager;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import lib.managers.FileBackedTaskManager;
+import lib.managers.TaskManager;
 import lib.tasks.Epic;
 import lib.tasks.SubTask;
 import lib.tasks.Task;
+import lib.web.typeAdapters.DurationAdapter;
+import lib.web.typeAdapters.LocalDateTimeAdapter;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 public class Main {
 
@@ -39,5 +46,8 @@ public class Main {
         boolean conditionThd = fstTaskManager.getEpicsList().equals(sndTaskManager.getEpicsList());
 
         System.out.println(conditionFst && conditionSnd && conditionThd); // true
+
+        sndTaskManager.deleteAllEpics();
+        sndTaskManager.deleteAllTasks();
     }
 }

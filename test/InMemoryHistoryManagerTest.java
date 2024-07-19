@@ -1,7 +1,7 @@
-import lib.HistoryManager;
-import lib.InMemoryHistoryManager;
-import lib.InMemoryTaskManager;
-import lib.TaskManager;
+import lib.managers.HistoryManager;
+import lib.managers.InMemoryHistoryManager;
+import lib.managers.InMemoryTaskManager;
+import lib.managers.TaskManager;
 import lib.tasks.Epic;
 import lib.tasks.SubTask;
 import lib.tasks.Task;
