@@ -1,3 +1,5 @@
+package managers;
+
 import lib.managers.HistoryManager;
 import lib.managers.InMemoryHistoryManager;
 import lib.managers.InMemoryTaskManager;

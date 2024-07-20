@@ -1,10 +1,12 @@
+package web;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lib.tasks.Epic;
 import lib.tasks.SubTask;
 import lib.tasks.Task;
-import lib.web.typeAdapters.DurationAdapter;
-import lib.web.typeAdapters.LocalDateTimeAdapter;
+import lib.web.gson.typeAdapters.DurationAdapter;
+import lib.web.gson.typeAdapters.LocalDateTimeAdapter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
