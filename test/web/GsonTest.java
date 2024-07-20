@@ -23,9 +23,9 @@ public class GsonTest {
     public void gsonInitialize() {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gson = gsonBuilder.setPrettyPrinting()
-                          .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
-                          .registerTypeAdapter(Duration.class, new DurationAdapter())
-                          .create();
+                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+                .registerTypeAdapter(Duration.class, new DurationAdapter())
+                .create();
     }
 
     @Test
@@ -68,7 +68,6 @@ public class GsonTest {
         epic.endTime = LocalDateTime.parse("2008-09-01T21:00");
         List<Short> supportList = List.of((short) 5, (short) 6);
         epic.subtasksIds = new ArrayList<>(supportList);
-
 
 
         String epicInJson = gson.toJson(epic);

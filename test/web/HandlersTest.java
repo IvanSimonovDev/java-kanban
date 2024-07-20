@@ -1,6 +1,8 @@
 package web;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import lib.tasks.Epic;
 import lib.tasks.SubTask;
@@ -34,7 +36,7 @@ public class HandlersTest {
     static final String ACCEPT_HEADER_VALUE = "application/json";
     static HttpTaskServer httpTaskServer;
     static HttpClient httpClient;
-    static  HttpRequest httpRequest;
+    static HttpRequest httpRequest;
     static HttpRequest.Builder requestBuilder;
     static HttpRequest.BodyPublisher bodyPublisher;
     static HttpResponse<String> httpResponse;
@@ -72,90 +74,91 @@ public class HandlersTest {
         bodyPublisher = HttpRequest.BodyPublishers.ofString(body, UTF_8);
         httpRequest = requestBuilder
                 .uri(uri)
-                .method(method,bodyPublisher)
+                .method(method, bodyPublisher)
                 .build();
-        return httpClient.send(httpRequest,bodyHandler);
+        return httpClient.send(httpRequest, bodyHandler);
     }
 
     // Tasks
     public void requestToCreateOneTask(Task task) throws IOException, InterruptedException {
         String requestBody = convertTaskOfTypeToJsonWithoutId(task);
-        httpResponse =  sendRequest("POST", "/tasks", requestBody);
+        httpResponse = sendRequest("POST", "/tasks", requestBody);
     }
 
     public Task requestForOneTask(short id) throws IOException, InterruptedException {
-        httpResponse =  sendRequest("GET", "/tasks/" + id, "");
+        httpResponse = sendRequest("GET", "/tasks/" + id, "");
         return parseJsonObject(httpResponse.body(), Task.class);
     }
 
     public void requestToDeleteOneTask(short id) throws IOException, InterruptedException {
-        httpResponse =  sendRequest("DELETE", "/tasks/" + id, "");
+        httpResponse = sendRequest("DELETE", "/tasks/" + id, "");
     }
 
     public List<Task> requestForAllTasks() throws IOException, InterruptedException {
-        httpResponse =  sendRequest("GET", "/tasks", "");
+        httpResponse = sendRequest("GET", "/tasks", "");
         return parseJsonArray(httpResponse.body(), new TasksListTypeToken());
     }
 
     // Subtasks
     public void requestToCreateOneSubTask(SubTask subTask) throws IOException, InterruptedException {
         String requestBody = convertTaskOfTypeToJsonWithoutId(subTask);
-        httpResponse =  sendRequest("POST", "/subtasks", requestBody);
+        httpResponse = sendRequest("POST", "/subtasks", requestBody);
     }
 
     public SubTask requestForOneSubTask(short id) throws IOException, InterruptedException {
-        httpResponse =  sendRequest("GET", "/subtasks/" + id, "");
+        httpResponse = sendRequest("GET", "/subtasks/" + id, "");
         return parseJsonObject(httpResponse.body(), SubTask.class);
     }
 
     public void requestToDeleteOneSubTask(short id) throws IOException, InterruptedException {
-        httpResponse =  sendRequest("DELETE", "/subtasks/" + id, "");
+        httpResponse = sendRequest("DELETE", "/subtasks/" + id, "");
     }
 
     public List<SubTask> requestForAllSubTasks() throws IOException, InterruptedException {
-        httpResponse =  sendRequest("GET", "/subtasks", "");
+        httpResponse = sendRequest("GET", "/subtasks", "");
         return parseJsonArray(httpResponse.body(), new SubTasksListTypeToken());
     }
 
     // Epics
     public void requestToCreateOneEpic(Epic epic) throws IOException, InterruptedException {
         String requestBody = convertTaskOfTypeToJsonWithoutId(epic);
-        httpResponse =  sendRequest("POST", "/epics", requestBody);
+        httpResponse = sendRequest("POST", "/epics", requestBody);
     }
 
     public Epic requestForOneEpic(short id) throws IOException, InterruptedException {
-        httpResponse =  sendRequest("GET", "/epics/" + id, "");
+        httpResponse = sendRequest("GET", "/epics/" + id, "");
         return parseJsonObject(httpResponse.body(), Epic.class);
     }
 
     public void requestToDeleteOneEpic(short id) throws IOException, InterruptedException {
-        httpResponse =  sendRequest("DELETE", "/epics/" + id, "");
+        httpResponse = sendRequest("DELETE", "/epics/" + id, "");
     }
 
     public List<Epic> requestForAllEpics() throws IOException, InterruptedException {
-        httpResponse =  sendRequest("GET", "/epics", "");
+        httpResponse = sendRequest("GET", "/epics", "");
         return parseJsonArray(httpResponse.body(), new EpicsListTypeToken());
     }
 
     public List<SubTask> requestForAllSubTasksOfEpic(short epicId) throws IOException, InterruptedException {
         String path = "/epics/" + epicId + "/subtasks";
-        httpResponse =  sendRequest("GET", path, "");
+        httpResponse = sendRequest("GET", path, "");
         return parseJsonArray(httpResponse.body(), new SubTasksListTypeToken());
     }
 
     public Task[] requestForHistory() throws IOException, InterruptedException {
-        httpResponse =  sendRequest("GET", "/history", "");
+        httpResponse = sendRequest("GET", "/history", "");
         return parseJsonArray(httpResponse.body(), new TasksArrayTypeToken());
     }
 
     public Task[] requestForPrioritizedTasksAndSubtasks() throws IOException, InterruptedException {
-        httpResponse =  sendRequest("GET", "/prioritized", "");
+        httpResponse = sendRequest("GET", "/prioritized", "");
         return parseJsonArray(httpResponse.body(), new TasksArrayTypeToken());
     }
 
     public <T> T parseJsonArray(String jsonArr, TypeToken<T> typeToken) {
         return gson.fromJson(jsonArr, typeToken.getType());
     }
+
     public <T> T parseJsonObject(String jsonObj, Type type) {
         return gson.fromJson(jsonObj, type);
     }

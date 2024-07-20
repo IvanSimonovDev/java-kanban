@@ -22,7 +22,7 @@ public class EpicsHandler extends BaseHttpHandler {
         } else if (pathContainsNumberOfParts(path, 2)) {
             handleGetTaskOfTypeById(httpExchange, getIdFromPath(path));
         } else {
-              handleGetAllSubtasksOfEpicById(httpExchange, getIdFromPath(path));
+            handleGetAllSubtasksOfEpicById(httpExchange, getIdFromPath(path));
         }
     }
 
