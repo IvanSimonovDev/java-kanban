@@ -13,7 +13,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 
 public abstract class BaseHttpHandler implements HttpHandler {
     public TaskManager taskManager;
@@ -30,6 +29,7 @@ public abstract class BaseHttpHandler implements HttpHandler {
     public static final String CONTENT_TYPE = "application/json; charset=utf-8";
 
     public static final Charset encoding = StandardCharsets.UTF_8;
+
     public BaseHttpHandler(TaskManager taskManager, Gson gson) {
         this.taskManager = taskManager;
         this.gson = gson;
@@ -39,25 +39,18 @@ public abstract class BaseHttpHandler implements HttpHandler {
     public void handle(HttpExchange httpExchange) throws IOException {
         try {
             String path = httpExchange.getRequestURI().getPath();
-            System.out.println("1");
             if (!isPathCorrect(path)) {
-                System.out.println("notCorrectPath");
                 throw new NotFoundException(WRONG_URL_PATH_NOTIFICATION);
             } else {
                 handleWhenPathCorrect(httpExchange, path);
-                System.out.println("3");
             }
         } catch (CollisionException exc) {
             sendHasInteractions(httpExchange);
-            System.out.println("collision");
         } catch (NotFoundException exc) {
             sendNotFound(httpExchange);
-            System.out.println("notFound");
         } catch (IOException | ManagerSaveLoadException exc) {
             sendText(httpExchange, INTERNAL_SERVER_ERROR_CODE, INTERNAL_SERVER_ERROR_NOTIFICATION);
-            System.out.println("500");
         }
-        System.out.println("end");
     }
 
     void handleWhenPathCorrect(HttpExchange httpExchange, String path) throws IOException, NotFoundException, CollisionException {
@@ -80,7 +73,7 @@ public abstract class BaseHttpHandler implements HttpHandler {
         }
     }
 
-    void handleGet(HttpExchange httpExchange, String path) throws IOException, NotFoundException{
+    void handleGet(HttpExchange httpExchange, String path) throws IOException, NotFoundException {
         short id;
         if (pathContainsNumberOfParts(path, 1)) {
             handleGetAllTasksOfType(httpExchange);
@@ -116,7 +109,6 @@ public abstract class BaseHttpHandler implements HttpHandler {
     }
 
 
-
     void sendText(HttpExchange httpExchange, int statusCode, String text) throws IOException {
         httpExchange.getResponseHeaders().set("Content-Type", CONTENT_TYPE);
         httpExchange.sendResponseHeaders(statusCode, BASIC_RESPONSE_BODY_SETTING);
@@ -128,7 +120,7 @@ public abstract class BaseHttpHandler implements HttpHandler {
     }
 
     void sendWithoutBody(HttpExchange httpExchange, int statusCode) throws IOException {
-        sendText(httpExchange, statusCode, "");;
+        sendText(httpExchange, statusCode, "");
     }
 
     private void sendNotFound(HttpExchange httpExchange) throws IOException {

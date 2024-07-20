@@ -1,3 +1,5 @@
+package managers;
+
 import lib.managers.InMemoryTaskManager;
 import org.junit.jupiter.api.BeforeEach;
 
