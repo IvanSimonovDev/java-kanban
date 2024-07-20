@@ -48,12 +48,12 @@ public class HistoryHandler extends BaseHttpHandler {
     }
 
     @Override
-    void handleDeleteTaskOfTypeById(HttpExchange httpExchange, short id)  {
+    void handleDeleteTaskOfTypeById(HttpExchange httpExchange, short id) {
 
     }
 
     @Override
-    public  boolean isPathCorrect(String path) {
+    public boolean isPathCorrect(String path) {
         return path.equals("/history");
     }
 }

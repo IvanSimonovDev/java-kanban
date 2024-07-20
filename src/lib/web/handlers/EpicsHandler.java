@@ -16,13 +16,13 @@ public class EpicsHandler extends BaseHttpHandler {
     }
 
     @Override
-    void handleGet(HttpExchange httpExchange, String path) throws IOException, NotFoundException{
+    void handleGet(HttpExchange httpExchange, String path) throws IOException, NotFoundException {
         if (pathContainsNumberOfParts(path, 1)) {
             handleGetAllTasksOfType(httpExchange);
         } else if (pathContainsNumberOfParts(path, 2)) {
             handleGetTaskOfTypeById(httpExchange, getIdFromPath(path));
         } else {
-              handleGetAllSubtasksOfEpicById(httpExchange, getIdFromPath(path));
+            handleGetAllSubtasksOfEpicById(httpExchange, getIdFromPath(path));
         }
     }
 

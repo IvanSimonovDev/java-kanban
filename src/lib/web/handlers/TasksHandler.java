@@ -3,13 +3,11 @@ package lib.web.handlers;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import lib.exceptions.CollisionException;
-import lib.exceptions.ManagerSaveLoadException;
 import lib.exceptions.NotFoundException;
 import lib.managers.TaskManager;
 import lib.tasks.Task;
 
 import java.io.IOException;
-import java.net.URI;
 
 public class TasksHandler extends BaseHttpHandler {
     public TasksHandler(TaskManager taskManager, Gson gson) {
