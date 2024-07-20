@@ -13,7 +13,7 @@ public class PrioritizedHandler extends HistoryHandler {
     }
 
     @Override
-    void handleGet(HttpExchange httpExchange, String path) throws IOException{
+    void handleGet(HttpExchange httpExchange, String path) throws IOException {
         String body = gson.toJson(taskManager.getPrioritizedTasks());
         sendText(httpExchange, OK_CODE, body);
     }

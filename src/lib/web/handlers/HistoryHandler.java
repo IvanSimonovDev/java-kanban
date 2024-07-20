@@ -15,7 +15,7 @@ public class HistoryHandler extends BaseHttpHandler {
 
     @Override
     void handleWhenPathCorrect(HttpExchange httpExchange, String path) throws IOException, NotFoundException, CollisionException {
-        String method = httpExchange.getRequestMethod();;
+        String method = httpExchange.getRequestMethod();
 
         switch (method) {
             case "GET":
@@ -27,7 +27,7 @@ public class HistoryHandler extends BaseHttpHandler {
     }
 
     @Override
-    void handleGet(HttpExchange httpExchange, String path) throws IOException{
+    void handleGet(HttpExchange httpExchange, String path) throws IOException {
         String body = gson.toJson(taskManager.getHistoryManager().getHistory());
         sendText(httpExchange, OK_CODE, body);
     }
