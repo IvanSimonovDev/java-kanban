@@ -170,7 +170,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void deleteEpic(short id) throws NotFoundException{
+    public void deleteEpic(short id) throws NotFoundException {
         getEpic(id);
         Epic epic = epicStorage.remove(id);
         historyManager.remove(id);
