@@ -54,8 +54,8 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void deleteSubTask(Short id) {
-        SubTask subTask = subTaskStorage.get(id);
+    public void deleteSubTask(Short id) throws NotFoundException {
+        SubTask subTask = getSubTask(id);
         subTaskStorage.remove(id);
 
         short epicId = subTask.epicId;
@@ -69,7 +69,8 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void updateSubTask(SubTask subTask) throws CollisionException {
+    public void updateSubTask(SubTask subTask) throws CollisionException, NotFoundException {
+        getSubTask(subTask.id);
         validateNoCollision(subTask);
         subTaskStorage.put(subTask.id, subTask);
         prioritizedTasks.remove(subTask);
@@ -120,14 +121,15 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void deleteTask(short id) {
+    public void deleteTask(short id) throws NotFoundException {
+        getTask(id);
         prioritizedTasks.remove(getTask(id));
         taskStorage.remove(id);
         historyManager.remove(id);
     }
 
     @Override
-    public void updateTask(Task updatedTask) throws CollisionException {
+    public void updateTask(Task updatedTask) throws CollisionException, NotFoundException {
         validateNoCollision(updatedTask);
         deleteTask(updatedTask.id);
         createTask(updatedTask);
@@ -163,11 +165,13 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void createEpic(Epic epic) {
+        epic.status = Statuses.NEW;
         epicStorage.put(epic.id, epic);
     }
 
     @Override
-    public void deleteEpic(short id) {
+    public void deleteEpic(short id) throws NotFoundException{
+        getEpic(id);
         Epic epic = epicStorage.remove(id);
         historyManager.remove(id);
 
@@ -183,6 +187,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void updateEpic(Epic updatedEpic) {
         Epic oldEpic = getEpic(updatedEpic.id);
         updatedEpic.subtasksIds = oldEpic.subtasksIds;
+        updatedEpic.status = oldEpic.status;
         updatedEpic.startTime = oldEpic.startTime;
         updatedEpic.duration = oldEpic.duration;
         updatedEpic.endTime = oldEpic.endTime;
@@ -191,13 +196,17 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public ArrayList<SubTask> subTasksOfEpic(short epicId) {
+    public ArrayList<SubTask> subTasksOfEpic(short epicId) throws NotFoundException {
         int initialCapacity = 5;
         ArrayList<SubTask> result = new ArrayList<>(initialCapacity);
         Epic epic = epicStorage.get(epicId);
-        Consumer<Short> addSubTaskToResult = subTaskId -> result.add(subTaskStorage.get(subTaskId));
-        epic.subtasksIds.stream().forEach(addSubTaskToResult);
-        return result;
+        if (epic != null) {
+            Consumer<Short> addSubTaskToResult = subTaskId -> result.add(subTaskStorage.get(subTaskId));
+            epic.subtasksIds.stream().forEach(addSubTaskToResult);
+            return result;
+        } else {
+            throw new NotFoundException("Epic not found.");
+        }
     }
 
     protected void setEpicStatus(short epicId) {
@@ -269,6 +278,7 @@ public class InMemoryTaskManager implements TaskManager {
         return this.historyManager;
     }
 
+    @Override
     public Set<Task> getPrioritizedTasks() {
         return prioritizedTasks;
     }

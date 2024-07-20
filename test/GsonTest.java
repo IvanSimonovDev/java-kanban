@@ -58,7 +58,7 @@ public class GsonTest {
     }
 
     @Test
-    public void epicShouldConvertCorrectly() {
+    public void fullSetEpicShouldConvertCorrectly() {
         //creating Epic
         Epic epic = new Epic((short) 1, "Epic_1", "Description_1", "NEW");
         epic.startTime = LocalDateTime.parse("2007-09-01T21:00");
@@ -76,14 +76,32 @@ public class GsonTest {
         Assertions.assertTrue(condition1 && condition2);
     }
 
+    @Test
+    public void partiallySetEpicShouldConvertCorrectly() {
+        //creating Epic
+        Epic epic = new Epic((short) 1, "Epic_1", "Description_1", "NEW");
+
+        String epicInJson = gson.toJson(epic);
+        Epic epicCopy = gson.fromJson(epicInJson, Epic.class);
+        boolean condition1 = tasksHaveSomeSameFields(epic, epicCopy);
+        boolean condition2 = epic.startTime == epicCopy.startTime && epic.duration == epicCopy.duration;
+        boolean condition3 = epic.endTime == epicCopy.endTime && epic.subtasksIds.equals(epicCopy.subtasksIds);
+        Assertions.assertTrue(condition1 && condition2 && condition3);
+    }
+
     public boolean tasksHaveSameFields(Task task1, Task task2) {
+        boolean condition = tasksHaveSomeSameFields(task1, task2);
+        boolean condition6 = task1.startTime.equals(task2.startTime);
+        boolean condition7 = task1.duration.equals(task2.duration);
+        return condition && condition6 && condition7;
+    }
+
+    public boolean tasksHaveSomeSameFields(Task task1, Task task2) {
         boolean condition1 = task1.id == task2.id;
         boolean condition2 = task1.title.equals(task2.title);
         boolean condition3 = task1.description.equals(task2.description);
         boolean condition4 = task1.status == task2.status;
-        boolean condition5 = task1.startTime.equals(task2.startTime);
-        boolean condition6 = task1.duration.equals(task2.duration);
-        boolean condition7 = task1.taskType == task2.taskType;
-        return condition1 && condition2 && condition3 && condition4 && condition5 && condition6 && condition7;
+        boolean condition5 = task1.taskType == task2.taskType;
+        return condition1 && condition2 && condition3 && condition4 && condition5;
     }
 }

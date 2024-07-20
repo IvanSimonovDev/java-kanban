@@ -18,18 +18,23 @@ public class HttpTaskServer {
 
     public static void main(String[] args) throws IOException {
         TaskManager taskManager = Managers.getDefaultFileBackedTaskManager();
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        Gson gson = gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
-                               .registerTypeAdapter(Duration.class, new DurationAdapter())
-                               .setPrettyPrinting()
-                               .create();
+        Gson gson = getDefaultGson();
 
         HttpServer httpServer = HttpServer.create(new InetSocketAddress(NET_PORT), BACKLOG_SETTING);
         httpServer.createContext("/tasks", new TasksHandler(taskManager, gson));
-       // httpServer.createContext("/subtasks", new SubtasksHandler(taskManager, gson));
-       // httpServer.createContext("/epics", new EpicsHandler(taskManager, gson));
-       // httpServer.createContext("/history", new HistoryHandler(taskManager, gson));
-        //httpServer.createContext("/prioritized", new PrioritizedHandler(taskManager, gson));
+        httpServer.createContext("/subtasks", new SubtasksHandler(taskManager, gson));
+        httpServer.createContext("/epics", new EpicsHandler(taskManager, gson));
+        httpServer.createContext("/history", new HistoryHandler(taskManager, gson));
+        httpServer.createContext("/prioritized", new PrioritizedHandler(taskManager, gson));
         httpServer.start();
+    }
+
+    public static Gson getDefaultGson() {
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        Gson gson = gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+                .registerTypeAdapter(Duration.class, new DurationAdapter())
+                .setPrettyPrinting()
+                .create();
+        return gson;
     }
 }
