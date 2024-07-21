@@ -5,7 +5,6 @@ import lib.managers.Managers;
 import lib.managers.TaskManager;
 import lib.tasks.Epic;
 import lib.tasks.SubTask;
-import lib.web.HttpTaskServer;
 import lib.web.handlers.BaseHttpHandler;
 import lib.web.handlers.EpicsHandler;
 import org.junit.jupiter.api.Assertions;
@@ -102,7 +101,7 @@ public class EpicsHandlerTest extends HandlersTest {
 
     public void initializeHandler() {
         TaskManager tasksManager = Managers.getDefaultFileBackedTaskManager();
-        Gson gson = HttpTaskServer.getDefaultGson();
+        Gson gson = Managers.getDefaultGson();
         handler = new EpicsHandler(tasksManager, gson);
     }
 }

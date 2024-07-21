@@ -1,5 +1,7 @@
 package lib.managers;
 
+import lib.exceptions.CollisionException;
+import lib.exceptions.NotFoundException;
 import lib.tasks.Epic;
 import lib.tasks.SubTask;
 import lib.tasks.Task;
@@ -10,13 +12,13 @@ import java.util.Set;
 public interface TaskManager {
 
     //methods for SubTask
-    SubTask getSubTask(short id);
+    SubTask getSubTask(short id) throws NotFoundException;
 
-    void createSubTask(SubTask subTask);
+    void createSubTask(SubTask subTask) throws CollisionException;
 
-    void deleteSubTask(Short id);
+    void deleteSubTask(Short id) throws NotFoundException;
 
-    void updateSubTask(SubTask subTask);
+    void updateSubTask(SubTask subTask) throws NotFoundException, CollisionException;
 
     ArrayList<SubTask> getSubTasksList();
 
@@ -24,13 +26,13 @@ public interface TaskManager {
 
     //methods for Task
 
-    Task getTask(short id);
+    Task getTask(short id) throws NotFoundException;
 
-    void createTask(Task task);
+    void createTask(Task task) throws CollisionException;
 
-    void deleteTask(short id);
+    void deleteTask(short id) throws NotFoundException;
 
-    void updateTask(Task updatedTask);
+    void updateTask(Task updatedTask) throws NotFoundException, CollisionException;
 
     ArrayList<Task> getTasksList();
 
@@ -38,15 +40,15 @@ public interface TaskManager {
 
     //methods for Epic
 
-    Epic getEpic(short id);
+    Epic getEpic(short id) throws NotFoundException;
 
     void createEpic(Epic epic);
 
-    void deleteEpic(short id);
+    void deleteEpic(short id) throws NotFoundException;
 
-    void updateEpic(Epic updatedEpic);
+    void updateEpic(Epic updatedEpic) throws NotFoundException;
 
-    ArrayList<SubTask> subTasksOfEpic(short epicId);
+    ArrayList<SubTask> subTasksOfEpic(short epicId) throws NotFoundException;
 
     ArrayList<Epic> getEpicsList();
 
@@ -56,5 +58,4 @@ public interface TaskManager {
     HistoryManager getHistoryManager();
 
     Set<Task> getPrioritizedTasks();
-
 }

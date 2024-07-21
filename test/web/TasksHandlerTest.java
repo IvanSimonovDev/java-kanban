@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import lib.managers.Managers;
 import lib.managers.TaskManager;
 import lib.tasks.Task;
-import lib.web.HttpTaskServer;
 import lib.web.handlers.BaseHttpHandler;
 import lib.web.handlers.TasksHandler;
 import org.junit.jupiter.api.Assertions;
@@ -80,7 +79,7 @@ public class TasksHandlerTest extends HandlersTest {
 
     public void initializeHandler() {
         TaskManager tasksManager = Managers.getDefaultFileBackedTaskManager();
-        Gson gson = HttpTaskServer.getDefaultGson();
+        Gson gson = Managers.getDefaultGson();
         handler = new TasksHandler(tasksManager, gson);
     }
 

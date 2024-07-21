@@ -1,29 +1,24 @@
 package lib.web;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpServer;
 import lib.managers.Managers;
 import lib.managers.TaskManager;
-import lib.web.gson.typeAdapters.DurationAdapter;
-import lib.web.gson.typeAdapters.LocalDateTimeAdapter;
 import lib.web.handlers.*;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.time.Duration;
-import java.time.LocalDateTime;
 
 public class HttpTaskServer {
     private static final int NET_PORT = 8080;
     private static final int BACKLOG_SETTING = 0;
 
-    HttpServer httpServer;
-    TaskManager taskManager;
+    private HttpServer httpServer;
+    private TaskManager taskManager;
 
     public HttpTaskServer() throws IOException {
         taskManager = Managers.getDefaultFileBackedTaskManager();
-        Gson gson = getDefaultGson();
+        Gson gson = Managers.getDefaultGson();
 
         httpServer = HttpServer.create(new InetSocketAddress(NET_PORT), BACKLOG_SETTING);
         httpServer.createContext("/tasks", new TasksHandler(taskManager, gson));
@@ -50,14 +45,5 @@ public class HttpTaskServer {
     public void stop() {
         int delay = 0;
         httpServer.stop(delay);
-    }
-
-
-    public static Gson getDefaultGson() {
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        return gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
-                .registerTypeAdapter(Duration.class, new DurationAdapter())
-                .setPrettyPrinting()
-                .create();
     }
 }

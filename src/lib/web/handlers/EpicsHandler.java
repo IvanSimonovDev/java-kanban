@@ -18,29 +18,29 @@ public class EpicsHandler extends BaseHttpHandler {
     @Override
     void handleGet(HttpExchange httpExchange, String path) throws IOException, NotFoundException {
         if (pathContainsNumberOfParts(path, 1)) {
-            handleGetAllTasksOfType(httpExchange);
+            handleGetAll(httpExchange);
         } else if (pathContainsNumberOfParts(path, 2)) {
-            handleGetTaskOfTypeById(httpExchange, getIdFromPath(path));
+            handleGetOne(httpExchange, getIdFromPath(path));
         } else {
-            handleGetAllSubtasksOfEpicById(httpExchange, getIdFromPath(path));
+            handleGetAllOfOne(httpExchange, getIdFromPath(path));
         }
     }
 
     @Override
-    void handleGetAllTasksOfType(HttpExchange httpExchange) throws IOException {
+    void handleGetAll(HttpExchange httpExchange) throws IOException {
         String body = gson.toJson(taskManager.getEpicsList());
         sendText(httpExchange, OK_CODE, body);
 
     }
 
     @Override
-    void handleGetTaskOfTypeById(HttpExchange httpExchange, short id) throws NotFoundException, IOException {
+    void handleGetOne(HttpExchange httpExchange, short id) throws NotFoundException, IOException {
         String body = gson.toJson(taskManager.getEpic(id));
         sendText(httpExchange, OK_CODE, body);
     }
 
     @Override
-    void handleCreateOrUpdateTaskOfType(HttpExchange httpExchange) throws IOException, CollisionException {
+    void handlePost(HttpExchange httpExchange) throws IOException, CollisionException {
         String requestBody = readRequestBody(httpExchange);
         Epic epicFromJson = gson.fromJson(requestBody, Epic.class);
 
@@ -64,12 +64,12 @@ public class EpicsHandler extends BaseHttpHandler {
     }
 
     @Override
-    public void handleDeleteTaskOfTypeById(HttpExchange httpExchange, short id) throws IOException {
+    public void handleDelete(HttpExchange httpExchange, short id) throws IOException {
         taskManager.deleteEpic(id);
         sendWithoutBody(httpExchange, OK_CODE);
     }
 
-    public void handleGetAllSubtasksOfEpicById(HttpExchange httpExchange, short epicId) throws IOException {
+    public void handleGetAllOfOne(HttpExchange httpExchange, short epicId) throws IOException {
         String body = gson.toJson(taskManager.subTasksOfEpic(epicId));
         sendText(httpExchange, OK_CODE, body);
     }
@@ -99,5 +99,4 @@ public class EpicsHandler extends BaseHttpHandler {
 
         return condition1 && condition2;
     }
-
 }

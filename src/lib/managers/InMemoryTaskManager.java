@@ -184,7 +184,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void updateEpic(Epic updatedEpic) {
+    public void updateEpic(Epic updatedEpic) throws NotFoundException {
         Epic oldEpic = getEpic(updatedEpic.id);
         updatedEpic.subtasksIds = oldEpic.subtasksIds;
         updatedEpic.status = oldEpic.status;

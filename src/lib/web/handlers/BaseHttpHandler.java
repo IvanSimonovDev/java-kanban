@@ -18,9 +18,11 @@ public abstract class BaseHttpHandler implements HttpHandler {
     public TaskManager taskManager;
     public Gson gson;
     public static final String INTERNAL_SERVER_ERROR_NOTIFICATION = "Internal Server Error.";
+    public static final String NOT_ALLOWED_ERROR_NOTIFICATION = "HTTP Request method not allowed";
     public static final String WRONG_URL_PATH_NOTIFICATION = "Wrong path in URL";
     public static final int INTERNAL_SERVER_ERROR_CODE = 500;
     public static final int NOT_FOUND_ERROR_CODE = 404;
+    public static final int METHOD_NOT_ALLOWED_ERROR_CODE = 405;
     public static final int NOT_ACCEPTABLE_ERROR_CODE = 406;
     public static final int OK_CODE = 200;
     public static final int CREATED_CODE = 201;
@@ -62,43 +64,53 @@ public abstract class BaseHttpHandler implements HttpHandler {
                 handleGet(httpExchange, path);
                 break;
             case "POST":
-                handleCreateOrUpdateTaskOfType(httpExchange);
+                handlePost(httpExchange);
                 break;
             case "DELETE":
                 id = getIdFromPath(path);
-                handleDeleteTaskOfTypeById(httpExchange, id);
+                handleDelete(httpExchange, id);
                 break;
             default:
-                sendText(httpExchange, INTERNAL_SERVER_ERROR_CODE, INTERNAL_SERVER_ERROR_NOTIFICATION);
+                sendText(httpExchange, METHOD_NOT_ALLOWED_ERROR_CODE, NOT_ALLOWED_ERROR_NOTIFICATION);
         }
     }
 
-    void handleGet(HttpExchange httpExchange, String path) throws IOException, NotFoundException {
+    void handleGet(HttpExchange httpExchange, String path) throws IOException {
         short id;
         if (pathContainsNumberOfParts(path, 1)) {
-            handleGetAllTasksOfType(httpExchange);
+            handleGetAll(httpExchange);
         } else {
             id = getIdFromPath(path);
-            handleGetTaskOfTypeById(httpExchange, id);
+            handleGetOne(httpExchange, id);
         }
     }
 
-    abstract void handleGetAllTasksOfType(HttpExchange httpExchange) throws IOException;
+    void handleGetAll(HttpExchange httpExchange) throws IOException {
+        sendText(httpExchange, METHOD_NOT_ALLOWED_ERROR_CODE, NOT_ALLOWED_ERROR_NOTIFICATION);
+    }
 
-    abstract void handleGetTaskOfTypeById(HttpExchange httpExchange, short id) throws NotFoundException, IOException;
+    void handleGetOne(HttpExchange httpExchange, short id) throws IOException {
+        sendText(httpExchange, METHOD_NOT_ALLOWED_ERROR_CODE, NOT_ALLOWED_ERROR_NOTIFICATION);
+    }
 
-    abstract void handleCreateOrUpdateTaskOfType(HttpExchange httpExchange) throws IOException, CollisionException;
+    void handlePost(HttpExchange httpExchange) throws IOException {
+        sendText(httpExchange, METHOD_NOT_ALLOWED_ERROR_CODE, NOT_ALLOWED_ERROR_NOTIFICATION);
+    }
 
-    abstract void handleDeleteTaskOfTypeById(HttpExchange httpExchange, short id) throws IOException;
+    void handleDelete(HttpExchange httpExchange, short id) throws IOException {
+        sendText(httpExchange, METHOD_NOT_ALLOWED_ERROR_CODE, NOT_ALLOWED_ERROR_NOTIFICATION);
+    }
 
-    public abstract boolean isPathCorrect(String path);
+    public boolean isPathCorrect(String path) {
+        return true;
+    }
 
     boolean pathContainsNumberOfParts(String path, int numberOfParts) {
         String[] splitPath = path.split(PATH_DELIMITER);
         return splitPath.length - 1 == numberOfParts;
     }
 
-    public short getIdFromPath(String path) {
+    public short getIdFromPath(String path) throws NotFoundException, ArrayIndexOutOfBoundsException {
         String[] splitPath = path.split(PATH_DELIMITER);
         int idPosition = 2;
         try {

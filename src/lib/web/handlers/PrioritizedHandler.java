@@ -6,7 +6,7 @@ import lib.managers.TaskManager;
 
 import java.io.IOException;
 
-public class PrioritizedHandler extends HistoryHandler {
+public class PrioritizedHandler extends BaseHttpHandler {
     public PrioritizedHandler(TaskManager taskManager, Gson gson) {
         super(taskManager, gson);
     }

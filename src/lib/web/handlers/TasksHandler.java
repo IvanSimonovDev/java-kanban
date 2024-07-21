@@ -15,20 +15,19 @@ public class TasksHandler extends BaseHttpHandler {
     }
 
     @Override
-    void handleGetAllTasksOfType(HttpExchange httpExchange) throws IOException {
+    void handleGetAll(HttpExchange httpExchange) throws IOException {
         String body = gson.toJson(taskManager.getTasksList());
         sendText(httpExchange, OK_CODE, body);
-
     }
 
     @Override
-    void handleGetTaskOfTypeById(HttpExchange httpExchange, short id) throws NotFoundException, IOException {
+    void handleGetOne(HttpExchange httpExchange, short id) throws NotFoundException, IOException {
         String body = gson.toJson(taskManager.getTask(id));
         sendText(httpExchange, OK_CODE, body);
     }
 
     @Override
-    void handleCreateOrUpdateTaskOfType(HttpExchange httpExchange) throws IOException, CollisionException {
+    void handlePost(HttpExchange httpExchange) throws IOException, CollisionException {
         String requestBody = readRequestBody(httpExchange);
         Task taskFromJson = gson.fromJson(requestBody, Task.class);
 
@@ -56,7 +55,7 @@ public class TasksHandler extends BaseHttpHandler {
     }
 
     @Override
-    public void handleDeleteTaskOfTypeById(HttpExchange httpExchange, short id) throws IOException {
+    public void handleDelete(HttpExchange httpExchange, short id) throws IOException {
         taskManager.deleteTask(id);
         sendWithoutBody(httpExchange, OK_CODE);
     }
