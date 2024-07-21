@@ -1,5 +1,5 @@
-import lib.FileBackedTaskManager;
-import lib.TaskManager;
+import lib.managers.FileBackedTaskManager;
+import lib.managers.TaskManager;
 import lib.tasks.Epic;
 import lib.tasks.SubTask;
 import lib.tasks.Task;
@@ -39,5 +39,8 @@ public class Main {
         boolean conditionThd = fstTaskManager.getEpicsList().equals(sndTaskManager.getEpicsList());
 
         System.out.println(conditionFst && conditionSnd && conditionThd); // true
+
+        sndTaskManager.deleteAllEpics();
+        sndTaskManager.deleteAllTasks();
     }
 }

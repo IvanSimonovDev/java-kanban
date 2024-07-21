@@ -25,7 +25,7 @@ public class Task {
         setTaskTypeAndCallMultipleSetter(title, description, status);
 
         short id = (short) RANDOM_GENERATOR.nextInt(Short.MAX_VALUE);
-        while (ID_LIST.contains(id)) {
+        while (ID_LIST.contains(id) || id == 0) {
             id = (short) RANDOM_GENERATOR.nextInt();
         }
         this.id = id;

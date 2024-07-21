@@ -1,4 +1,6 @@
-import lib.InMemoryTaskManager;
+package managers;
+
+import lib.managers.InMemoryTaskManager;
 import lib.tasks.Epic;
 import lib.tasks.Statuses;
 import lib.tasks.SubTask;
